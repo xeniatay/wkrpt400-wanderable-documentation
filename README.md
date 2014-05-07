@@ -27,6 +27,10 @@ specific examples illustrating the impact of the software or of the manual on th
 
 ### How Things Work
 
+- frontend philosophy
+- code guide
+
+
 #### Frontend Tech Stack
 
 At Wanderable, we use the following technologies:
@@ -106,7 +110,7 @@ We then include each compiled manifest into the layout they belong in.
 
 A good rule of thumb when in doubt is just to grep for any file including `-manifest`.
 
-##### LESS bundles and Bootstrap
+##### CSS Manifests
 
 You may notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
 
@@ -154,36 +158,34 @@ The Bootstrap CSS components most commonly used on the site are
     - Buttons
     - Helper Classes
 
-#### JS Bundles
+##### JS Manifests 
 
-The `ie-manifest` bundle is a special bundle created to handle LTIE9 browsers. In those browsers (which Wanderable no longer supports), it triggers an unobstrusive header prompting the user to upgrade their browser.
+The JS manifest files are a lot more straightforward - they use the Sprocket directives to include either entire directories or specific files from certain directories, which are all commented in each manifest.
 
-- Concatenation and minifying through Sprockets
-- Less requests
-- Cached 
-- Using manifests and bundles
+*Note the difference between require and require_tree* 
+*jQuery and jQueryujs are required through gems*
+
+One point to note is that the JS manifests do have dependencies - certain libraries like jQuery, Bootstrap, etc. have to be included at the top of the file before other plugins that use it. 
+
+`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers (which Wanderable no longer supports), it triggers an unobstrusive header prompting the user to upgrade their browser.
+
+We have started migrating to use coffee, but 90% of our files are still old JS.
+
+Note: JS manifests are always included at the bottom of the body in a layout, to allow the user to interact with the site without needing to wait for all scripts to be done loading. 
+
+Therefore, any inline page JS should be included like this:
+
+    <% content_for :page_end do %>
+        // code here
+    <% end %>
+
+##### Responsive
+
 - cloudinary
 - caching responsive
-The biggest reason for using the Asset Pipeline is concatenation and minifying of all assets on the site. 
-Fewer requests automatically mean 
-
-    E.g.
-
-- Brief summary DONE 
-- assets pipeline DONE
-- coffee
-- compiling less
-- links to relevant rails docs
-- responsive
-- frontend philosophy
-- code guide
-
-Work report: 
-### Using Bootstrap at Wanderable
-- overrides and caveats
-     - nav breakpoint
-     - helper responsive classes
-- Conventions 
+- nav
+- nav breakpoints
+- grid
 
 ### Workflow/helpful tools
 - adding a new page
@@ -201,7 +203,7 @@ Note: Reading up on the Chrome Developer Tools is a *very good way* to learn wha
     - timeline (jank, repainting)
     - resources (cookies, localhost, localstorage)
 
-### Wanderable Site Components
+### Wanderable Site Layouts 
 - public
 - internal
 - layout
