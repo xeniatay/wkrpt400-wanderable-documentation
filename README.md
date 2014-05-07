@@ -47,24 +47,24 @@ The Asset Pipeline allows us to concatenate all specified LESS or Coffee files i
 
 The process of concatenation and minification is called asset precompilation. This is done through Heroku when we deploy a new version of our app.
 
-    > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
+> The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
 
-    > The first feature of the pipeline is to concatenate assets, which can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.
+> The first feature of the pipeline is to concatenate assets, which can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.
 
-    > Sprockets concatenates all JavaScript files into one master .js file and all CSS files into one master .css file. [...]
+> Sprockets concatenates all JavaScript files into one master .js file and all CSS files into one master .css file. [...]
 
-    > The second feature of the asset pipeline is asset minification or compression. For CSS files, this is done by removing whitespace and comments. For JavaScript, more complex processes can be applied. You can choose from a set of built in options or specify your own.
+> The second feature of the asset pipeline is asset minification or compression. For CSS files, this is done by removing whitespace and comments. For JavaScript, more complex processes can be applied. You can choose from a set of built in options or specify your own.
 
-    > The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets. Supported languages include Sass for CSS, CoffeeScript for JavaScript, and ERB for both by default.
+> The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets. Supported languages include Sass for CSS, CoffeeScript for JavaScript, and ERB for both by default.
 
 Here is an example using the Networks tab in the [Chrome Developer Tools](https://developers.google.com/chrome-developer-tools/docs/network)
 
-    E.g. Take a look at the networks panel in the Chrome Devtools on initial load
+> E.g. Take a look at the networks panel in the Chrome Devtools on initial load
 
-    Now take a look at it on page reload
-    (explain this)
+> Now take a look at it on page reload
+(explain this)
 
-#### How we use the Asset Pipeline
+#### Using the Asset Pipeline with Wanderable Site Components
 
 Wanderable uses a customized strategy for asset precompilation, targeted towards the separate componenents of our site. Each of these components are targeted towards a different audience:
 
@@ -75,11 +75,13 @@ Wanderable uses a customized strategy for asset precompilation, targeted towards
     - Merchant Portal: merchants going through our self-serve Merchant Network
     - Admin: for internal use
 
-You will learn more about the separate components in section TODO. 
+Each component of the site generally has its own CSS and JS manifest and layout template in `apps/views/layouts`. 
+
+TODO talk more about site componenets
 
 For now, we will focus on how we handle asset precompilation for CSS and JS, with Bootstrap, LESS, Coffee and Rails. 
 
-##### LESS, Bootstrap and the Asset Pipeline
+##### Manifest Files 
 
 As mentioned earlier, Wanderable has many separate components that comprise the entire app. This requires us to handle asset loading and caching in a smarter way - for example, it does not make sense to load all of the styles for the public AND internal site if the user is merely a guest landing on a registry page to purchase a gift.
 
@@ -87,9 +89,74 @@ Thus, we allocated separate CSS and JS manifests for each of these components.
 
 > Sprockets uses manifest files to determine which assets to include and serve. These manifest files contain directives - instructions that tell Sprockets which files to require in order to build a single CSS or JavaScript file. With these directives, Sprockets loads the files specified, processes them if necessary, concatenates them into one single file and then compresses them (if Rails.application.config.assets.compress is true). By serving one file rather than many, the load time of pages can be greatly reduced because the browser makes fewer requests. Compression also reduces file size, enabling the browser to download them faster.
 
+Our manifest files are located at `app/assets/stylesheets/*-manifest.css` and `app/assets/javascripts/*-manifest.js`
 
+Setting it up: in `application.rb`, we include the following line of code: 
 
+    config.assets.precompile += %w( *-manifest.css *-manifest.js )
 
+This automatically adds any filepath ending in `-manifest.css` or `-manifest.js` to the precompile path. The original manifests were `application.css` and `application.js`. 
+
+Each manifest file contains [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprockets which files to concatenate and minify into that specific manifest. 
+
+We then include each compiled manifest into the layout they belong in. 
+
+    <%= stylesheet_link_tag 'public-manifest' %>
+    <%= javascript_include_tag "public-manifest" %>
+
+A good rule of thumb when in doubt is just to grep for any file including `-manifest`.
+
+##### LESS bundles and Bootstrap
+
+You may notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
+
+This setup is to allow us to work with LESS. Wanderable relies on Bootstrap heavily, and Bootstrap makes heavy use of mixins, variables and other wonderful LESS features. 
+
+Because manifest files are `.css` files, they are not able to compile from LESS the way we want to. Compiling across files is very important to us in the LESS workflow, to allow us to use the `@import` feature and other fancy things. Thus, our workaround is as such:
+
+- A `*-manifest.css` file that includes only `-bundle` files. This gets precompiled and served to the user
+- A `*-bundle.less` file that imports all the necessary LESS files across our assets for the particular site component
+    - All newly created LESS files have to be included in their respective bundle through the `@import` function
+
+The `global-bundle.less` is a special bundle that does not belong to any manifest. This is because it stands alone as the set of basic Wanderable styles 
+    - bootstrap overrides
+    - header styles
+    - footer styles
+    - type
+
+Separating out the global bundle allows us to keep the bundle files [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself) - the bundle can simply be included in other bundles, instead of repeating the `@import` statements over and over again.
+
+We see this behaviour again in the `channel-bundle`, which imports the `internal-bundle`. 
+
+*Note: the bundle/manifest setup works well in separating components, but may still cause repeated code in final compilation. It is up to the developer to decide on a tradeoff between DRY or clean code.*
+
+###### Processing LESS, good practices and current conventions
+
+Currently, *most* LESS files are named with the following format: 
+
+_[filename]-[hyphenate]-[all]-[other]-[words].less 
+
+The underscore was more important pre-less-rails, when we were compiling LESS files manually in our local environments. Underscores signify LESS partials, which we do not want compiled.
+
+However, less-rails and the asset pipeline now handle that without any worry on our end. Our files are currently in a mixed syntax, some with and without prepended `_`, and some hyphenated and some underscored. It would be nice to someday agree on a convention and rename all files to follow it. 
+
+##### Working with Bootstrap
+
+Wanderable uses a heavily customized version of Bootstrap. You can see the exact variable overrides in `app/assets/stylesheets/less/global/bootstrap_overrides/_variables.less`
+
+Note: our customization was done manually, not through the [customizer](http://getbootstrap.com/customize/), and thus is a little messy. It consists of variables which *may not* have originally been defined in Bootstrap's `variable.less`. *Nice to have: cleaning up the overrides file*
+
+The Bootstrap CSS components most commonly used on the site are
+    - Grid system and responsive utilities 
+    - Typography
+    - Tables
+    - Forms
+    - Buttons
+    - Helper Classes
+
+#### JS Bundles
+
+The `ie-manifest` bundle is a special bundle created to handle LTIE9 browsers. In those browsers (which Wanderable no longer supports), it triggers an unobstrusive header prompting the user to upgrade their browser.
 
 - Concatenation and minifying through Sprockets
 - Less requests
@@ -125,6 +192,7 @@ Work report:
         - html
         - scope
         - bundle
+color scheme
 
 Note: Reading up on the Chrome Developer Tools is a *very good way* to learn what the browser is capable of, and how performance optimization is done. 
     - console debugger and stuff
