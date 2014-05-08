@@ -1,45 +1,46 @@
-## Wanderable Front End 
-========
+# Wanderable: Frontend Notes
 
-### Table of Contents
+> Notes
 1500 and 2000 words
 Title Page (Section 3.2)
 Letter or Memorandum of Submittal (Section 3.3)
-Analysis (Section 3.7; Section 3.12 if you are submitting a user manual or a non-analytical report)
-
+Analysis (Section 3.12 if you are submitting a user manual or a non-analytical report)
 Recommendations, if appropriate (Section 3.9)
-
 Acknowledgments, if appropriate (Section 3.11)
-
 Completed employer evaluation form (.pdf) (Section 2.2)
 
-### 500 word Analysis 
+## 500 word Analysis 
 
-Include a Title Page and Letter or Memorandum of Submittal with your Analysis.
+    Include a Title Page and Letter or Memorandum of Submittal with your Analysis. 
+    For example, if you write a user’s manual, you might include the following: 
+    the purpose of the manual
+    the characteristics of a good user manual
+    possible improvements to the manual
+    reasons why the software described in the manual is needed and the problems it solves
+    specific examples illustrating the impact of the software or of the manual on the user
 
-For example, if you write a user’s manual, you might include the following:
+## Table of Contents
 
-the purpose of the manual
-the characteristics of a good user manual
-possible improvements to the manual
-reasons why the software described in the manual is needed and the problems it solves
-specific examples illustrating the impact of the software or of the manual on the user
+## Development Stack
 
-### How Things Work
+The Wanderable site is built using:
 
-- frontend philosophy
-- code guide
-
-
-### Frontend Tech Stack
-
-At Wanderable, we use the following technologies:
-- Ruby (1.9.3)
 - [Rails (3.1.3)](http://guides.rubyonrails.org/)
-- [LESS (1.7.0)](http://lesscss.org/) via the [less-rails gem](https://github.com/metaskills/less-rails)
-- Coffee via the [coffee-rails gem](https://github.com/rails/coffee-rails)
+> Ruby on Rails is a full-stack web framework optimized for programmer happiness and sustainable productivity. It encourages beautiful code by favoring convention over configuration.
+> The Rails community has spawned an immense collection of plugins and libraries, each packaged in a self-contained format called a *gem*. 
+
+- [LESS (1.7.0)](http://lesscss.org/) via the [less-rails gem](https://github.com/metaskills/less-rails) 
+> Less extends the CSS language, adding features that allow variables, mixins, functions and many other techniques that allow you to make CSS that is more maintainable, themable and extendable. 
+
+- [CoffeeScript](http://coffeescript.org/) via the [coffee-rails gem](https://github.com/rails/coffee-rails)
+> CoffeeScript is a little language that compiles into JavaScript. CoffeeScript is an attempt to expose the good parts of JavaScript in a simple way. 
+
 - [Bootstrap (3.1.1)](http://getbootstrap.com/)
-- jQuery via the [jQuery-rails gem](https://github.com/rails/jquery-rails).
+> The most popular front-end framework for developing responsive, mobile first projects on the web.
+
+- jQuery via the [jQuery-rails gem](https://github.com/rails/jquery-rails)
+> jQuery is a fast, small, and feature-rich JavaScript library.
+
 
 #### Rails Asset Pipeline
 
@@ -72,12 +73,12 @@ Here is an example using the Networks tab in the [Chrome Developer Tools](https:
 
 Wanderable uses a customized strategy for asset precompilation, targeted towards the separate componenents of our site. Each of these components are targeted towards a different audience:
 
-    - Public Site: potential users and guests looking for a registry
-    - Internal Site: existing users who are using our actual product
-    - Registry Layouts: existing users viewing others' registries, or guests who are purchasing gifts
-    - Channels: white-label hotel registries and the customers they drive to us
-    - Merchant Portal: merchants going through our self-serve Merchant Network
-    - Admin: for internal use
+- Public Site: potential users and guests looking for a registry
+- Internal Site: existing users who are using our actual product
+- Registry Layouts: existing users viewing others' registries, or guests who are purchasing gifts
+- Channels: white-label hotel registries and the customers they drive to us
+- Merchant Portal: merchants going through our self-serve Merchant Network
+- Admin: for internal use
 
 Each component of the site generally has its own CSS and JS manifest and layout template in `apps/views/layouts`. 
 
@@ -443,6 +444,9 @@ Note: Reading up on the Chrome Developer Tools is a *very good way* to learn wha
     - networks
     - timeline (jank, repainting)
     - resources (cookies, localhost, localstorage)
+
+- frontend philosophy
+- code guide
 
 ### Wanderable Site Layouts 
 - public
