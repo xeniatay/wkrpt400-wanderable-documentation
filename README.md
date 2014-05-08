@@ -30,7 +30,6 @@ The Wanderable site is built using:
 
 - [LESS (1.7.0)](http://lesscss.org/) via the [less-rails gem](https://github.com/metaskills/less-rails) 
 > A *gem* is a Ruby software package that provides external functionalities to an existing Rails project. 
-
 > Less is a CSS-preprocessor, meaning that it extends the CSS language, adding features that allow variables, mixins, functions and many other techniques that allow you to make CSS that is more maintainable, themable and extendable. 
 
 - [CoffeeScript](http://coffeescript.org/) via the [coffee-rails gem](https://github.com/rails/coffee-rails)
@@ -39,36 +38,58 @@ The Wanderable site is built using:
 - [Bootstrap (3.1.1)](http://getbootstrap.com/)
 > The most popular front-end framework for developing responsive, mobile first projects on the web.
 
-- jQuery via the [jQuery-rails gem](https://github.com/rails/jquery-rails)
+- [jQuery](http://jquery.com/) via the [jQuery-rails gem](https://github.com/rails/jquery-rails)
 > jQuery is a fast, small, and feature-rich JavaScript library.
 
+Of course, the app does not soly rely on these technologies. Rather, these are the fundamental tools needed to begin development on Wanderable's frontend. 
 
-#### Rails Asset Pipeline
-
-Wanderable upgraded to Rails 3.1.3 in March 2014, enabling usage of the [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) in our development workflow. 
-
-The Asset Pipeline allows us to concatenate all specified LESS or Coffee files into master CSS and JS files, which load in a single request upon initial site visit. These files are then cached in the user's browser, and cost significantly less load time throughout the rest of a user's browsing experience or on return visits. 
-
-> [Sprockets](https://signalvnoise.com/posts/1587-introducing-sprockets-javascript-dependency-management-and-concatenation) was originally introduced by Basecamp in 2009. Sprockets is a Ruby library that preprocesses and concatenates JavaScript source files.
-
-The process of concatenation and minification is called asset precompilation. This is done through Heroku when we deploy a new version of our app.
+### Wanderable's Asset Pipeline
 
 > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
 
+The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of the pipeline functionality followed by an guide to Wanderable-specific pipeline behaviour. The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
+
+#### Asset Precompilation: Concatenation and Minification 
+
 > The first feature of the pipeline is to concatenate assets, which can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.
 
-> Sprockets concatenates all JavaScript files into one master .js file and all CSS files into one master .css file. [...]
+> The second feature of the asset pipeline is asset minification or compression. [...]
 
-> The second feature of the asset pipeline is asset minification or compression. For CSS files, this is done by removing whitespace and comments. For JavaScript, more complex processes can be applied. You can choose from a set of built in options or specify your own.
+Through the Asset Pipeline, Sprockets (a Ruby library) concatenates and minifies all specified CoffeeScript/JS files into one master `.js` file, and all Less files into one master `.css` file. This process is called asset precompilation.
 
-> The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets. Supported languages include Sass for CSS, CoffeeScript for JavaScript, and ERB for both by default.
+Wanderable's full asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
 
-Here is an example using the Networks tab in the [Chrome Developer Tools](https://developers.google.com/chrome-developer-tools/docs/network)
+On a local development server, assets are not concatenated or minified for the sake of debugging. However, this means that the local server makes *many* requests on page load for every single file included in the precompile path. This can be slow and frustrating, so to disable this functionality and use precompiled files in development, change the following line to false:
 
-> E.g. Take a look at the networks panel in the Chrome Devtools on initial load
+    # Expand the lines which load the assets
+    config.assets.debug = true 
 
-> Now take a look at it on page reload
-(explain this)
+*Note that this is best done only if the developer is very absolutely not touching any frontend code. Do not commit this for the sake of other developers.*
+
+On Production, the master CSS and JS files are always precompiled. On initial visit, both files are requested from the server and subsequently cached by the browser. These cached files result in a significant decrease in load time throughout the rest of a user's browsing experience on the site, or on return visits. 
+
+Here is an example of the browser requests on initial load of Wanderable's homepage:
+
+> TODO insert image
+
+Now look at the browser requests upon page reload - after the JS and CSS manifests have been cached.
+
+> TODO insert image
+
+Voila! The load request sizes have been significantly reduced. 
+*Note: the reduced size is also partly due to image caching through Cloudinary*
+
+#### Asset Precompilation: Less and CoffeeScript
+
+> The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets.
+
+Wanderable uses the pipeline to allow live compilation of Less and CoffeeScript in development mode. This integration happens through the `less-rails` and `coffee-rails` gems, and do not require extra effort on a developer's part. 
+
+Compiling Less and CoffeeScript through the Asset Pipeline removes the hassle of keeping compiled `.less` to `.css` files and `.coffee` to `.js` files in the repository. It also prevents merge conflicts caused by a difference in compilers, or updated files that did not actually have conflicts, but were compiled to a common file. 
+
+**Note**: Compiling using the pipeline does mean that your local server may be slower to respond, or fail silently if there is a Less or CoffeeScript syntax error. 
+
+--- STOPPED HERE --
 
 #### Using the Asset Pipeline with Wanderable Site Components
 
@@ -438,6 +459,8 @@ Changing your shell (bash, zsh, fish) also allows you to add cool stuff in your 
 Sublime Text 3 is a great open-source text editor, best feature is fuzzy finding, which allows you to `cmd + p` and search for any filename without needed to autocomplete. It has Vim support in the form of Vintage and Vintageous packages, but note that these packages are still being developed and it does not act exactly like Vim although it tries its best.
 
 CodeKit is a great tool for compiling LESS, Coffee, or any other sort of pre-processed languages. It costs $30 and hasn't been necessary for Wanderable since we started compiling LESS and Coffee through Rails, but it is good to know. It also offers Linting on the fly!
+
+using the Networks tab in the [Chrome Developer Tools](https://developers.google.com/chrome-developer-tools/docs/network)
 
 Note: Reading up on the Chrome Developer Tools is a *very good way* to learn what the browser is capable of, and how performance optimization is done. 
     - console debugger and stuff
