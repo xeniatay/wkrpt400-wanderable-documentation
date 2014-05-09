@@ -97,28 +97,31 @@ Compiling Less and CoffeeScript through the Asset Pipeline removes the hassle of
 
 Wanderable uses a customized strategy for asset precompilation. Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we have separate manifest files for individual site components. 
 
+Each site component has:
+    - A layout template, see `views/layouts/`
+    - A CSS manifest file, see `app/assets/stylesheets/*-manifest.css`
+    - A JS manifest file, see `app/assets/javascripts/*-manifest.js` 
+
 **What are the Wanderable site components?**
 
 - Public Site 
     - For potential users and guests looking for a registry
-    - `views/layouts/pubsite_layout.html.erb`, `app/assets/stylesheets/public-manifest.css`, `app/assets/javascripts/public-manifest.js`
+    - `pubsite_layout.html.erb`, `public-manifest.css`, `public-manifest.js`
 - Internal Site 
     - For couples who log in and edit their registries
-    - `views/layouts/application.html.erb`, `app/assets/stylesheets/internal-manifest.css`, `app/assets/javascripts/internal-manifest.js`
+    - `application.html.erb`, `internal-manifest.css`, `internal-manifest.js`
 - Registry Layouts 
     - For guests making a gift purchase, or existing users browsing other registries
-    - `views/layouts/registry_layout.html.erb`, `app/assets/stylesheets/registry-layouts-manifest.css`, `app/assets/javascripts/layout-manifest.js`
+    - `registry_layout.html.erb`, `registry-layouts-manifest.css`, `layout-manifest.js`
 - Channels 
     - For guests referred to us through our white-label hotel partnerships 
-    - `views/layouts/channel.html.erb`, `app/assets/stylesheets/channel-manifest.css`, `app/assets/javascripts/channel-manifest.js`
+    - `channel.html.erb`, `channel-manifest.css`, `channel-manifest.js`
 - Merchant Portal 
     - For merchants going through our self-serve Merchant Network
-    - `views/layouts/merchant_portal.html.erb`, `app/assets/stylesheets/merchant-manifest.css`, `app/assets/javascripts/merchant-manifest.js`
+    - `merchant_portal.html.erb`, `merchant-manifest.css`, `merchant-manifest.js`
 - Admin 
     - For internal use
-    - `views/layouts/admin_layout.html.erb`, `app/assets/stylesheets/admin-manifest.css`, `app/assets/javascripts/admin-manifest.js`
-
-Each of these site components have a layout template, CSS manifest file and JS manifest file. 
+    - `admin_layout.html.erb`, `admin-manifest.css`, `admin-manifest.js`
 
 **Why have separate manifest files for each site component?**
 
@@ -130,26 +133,25 @@ Thus, splitting up these manifests based on site component and target audience a
 
 For now, we will focus on how we handle asset precompilation for CSS and JS, with Bootstrap, LESS, Coffee and Rails. 
 
-#### Manifest Files 
+#### How do manifest files work?
 
-> Sprockets uses manifest files to determine which assets to include and serve. These manifest files contain directives - instructions that tell Sprockets which files to require in order to build a single CSS or JavaScript file. With these directives, Sprockets loads the files specified, processes them if necessary, concatenates them into one single file and then compresses them (if Rails.application.config.assets.compress is true). By serving one file rather than many, the load time of pages can be greatly reduced because the browser makes fewer requests. Compression also reduces file size, enabling the browser to download them faster.
+By default, the asset pipeline precompiles the manifest files `application.css` and `application.js`, so that they can be included in any `.html.erb` file with the following code:
 
-Our manifest files are located at `app/assets/stylesheets/*-manifest.css` and `app/assets/javascripts/*-manifest.js`
+    <%= stylesheet_link_tag 'application' %>
+    <%= javascript_include_tag 'application' %>
 
-Setting it up: in `application.rb`, we include the following line of code: 
+In order to allow precompilation of multiple manifest files, we added the following line in `application.rb`: 
 
     config.assets.precompile += %w( *-manifest.css *-manifest.js )
 
-This automatically adds any filepath ending in `-manifest.css` or `-manifest.js` to the precompile path. The original manifests were `application.css` and `application.js`. 
+This line automatically adds any files ending in `-manifest.css` or `-manifest.js` to the precompile path.
 
-Each manifest file contains [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprockets which files to concatenate and minify into that specific manifest. 
+Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into that specific manifest. 
 
-We then include each compiled manifest into the layout they belong in. 
+We can thus include our custom manifests into the layout they belong in. 
 
     <%= stylesheet_link_tag 'public-manifest' %>
-    <%= javascript_include_tag "public-manifest" %>
-
-A good rule of thumb when in doubt is just to grep for any file including `-manifest`.
+    <%= javascript_include_tag 'public-manifest' %>
 
 #### CSS Manifests
 
