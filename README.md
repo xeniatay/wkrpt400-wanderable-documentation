@@ -95,12 +95,15 @@ Compiling Less and CoffeeScript through the Asset Pipeline removes the hassle of
 
 #### Using the Asset Pipeline with Wanderable Site Components
 
-Wanderable uses a customized strategy for asset precompilation. Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we have separate manifest files for individual site components. 
+Wanderable uses a customized strategy for asset precompilation. 
+
+Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we have separate manifest files for individual site components. 
 
 Each site component has:
-    - A layout template, see `views/layouts/`
-    - A CSS manifest file, see `app/assets/stylesheets/*-manifest.css`
-    - A JS manifest file, see `app/assets/javascripts/*-manifest.js` 
+
+    - A layout template in `views/layouts/`
+    - A CSS manifest file in `app/assets/stylesheets/`
+    - A JS manifest file in `app/assets/javascripts/` 
 
 **What are the Wanderable site components?**
 
@@ -131,9 +134,9 @@ The purpose of a manifest file is to speed up the load time of our site. We know
 
 Thus, splitting up these manifests based on site component and target audience allows us to reduce load time for everyone who visits Wanderable. 
 
-For now, we will focus on how we handle asset precompilation for CSS and JS, with Bootstrap, LESS, Coffee and Rails. 
-
 #### How do manifest files work?
+
+Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into that specific manifest. 
 
 By default, the asset pipeline precompiles the manifest files `application.css` and `application.js`, so that they can be included in any `.html.erb` file with the following code:
 
@@ -146,7 +149,6 @@ In order to allow precompilation of multiple manifest files, we added the follow
 
 This line automatically adds any files ending in `-manifest.css` or `-manifest.js` to the precompile path.
 
-Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into that specific manifest. 
 
 We can thus include our custom manifests into the layout they belong in. 
 
@@ -157,35 +159,28 @@ We can thus include our custom manifests into the layout they belong in.
 
 You may notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
 
-This setup is to allow us to work with LESS. Wanderable relies on Bootstrap heavily, and Bootstrap makes heavy use of mixins, variables and other wonderful LESS features. 
+This setup is a workaround to accommodate Less precompilation while still using the asset pipeline and manifest system. 
 
-Because manifest files are `.css` files, they are not able to compile from LESS the way we want to. Compiling across files is very important to us in the LESS workflow, to allow us to use the `@import` feature and other fancy things. Thus, our workaround is as such:
+*Explanation*
+Less files included in a manifest through Sprocket directives do not behave the same way as including a file using `@import`. With Sprocket, files are simply concatenated without pre-processing - compiling Less variables to HEX, mixins to actual classes, etc. 
 
-- A `*-manifest.css` file that includes only `-bundle` files. This gets precompiled and served to the user
-- A `*-bundle.less` file that imports all the necessary LESS files across our assets for the particular site component
-    - All newly created LESS files have to be included in their respective bundle through the `@import` function
+In order to make full use of Bootstrap and Less variables and mixins, we use the *bundle* workaround: 
 
-The `global-bundle.less` is a special bundle that does not belong to any manifest. This is because it stands alone as the set of basic Wanderable styles 
+- A `*-manifest.css` file that includes only `-bundle` files. This gets precompiled and served to the user.
+- A `*-bundle.less` file that `@import`s all other required Less files 
+    - Any newly created Less file has to be included in the bundle it belongs to, through the `@import` function
+
+**Note: Imported Bundles**
+The `global-bundle.less` is a special bundle that does not belong to any manifest. It stands alone as a set of basic Wanderable styles and contains the following:
+
     - bootstrap overrides
     - header styles
     - footer styles
     - type
 
-Separating out the global bundle allows us to keep the bundle files [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself) - the bundle can simply be included in other bundles, instead of repeating the `@import` statements over and over again.
+This bundle is separated from the rest so that bundle files are kept [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself). The global bundle is simply included in other bundles, instead of having mass repetition of `@import` statements in each bundle.
 
 We see this behaviour again in the `channel-bundle`, which imports the `internal-bundle`. 
-
-*Note: the bundle/manifest setup works well in separating components, but may still cause repeated code in final compilation. It is up to the developer to decide on a tradeoff between DRY or clean code.*
-
-##### Processing LESS, good practices and current conventions
-
-Currently, *most* LESS files are named with the following format: 
-
-_[filename]-[hyphenate]-[all]-[other]-[words].less 
-
-The underscore was more important pre-less-rails, when we were compiling LESS files manually in our local environments. Underscores signify LESS partials, which we do not want compiled.
-
-However, less-rails and the asset pipeline now handle that without any worry on our end. Our files are currently in a mixed syntax, some with and without prepended `_`, and some hyphenated and some underscored. It would be nice to someday agree on a convention and rename all files to follow it. 
 
 #### Working with Bootstrap
 
@@ -491,6 +486,16 @@ Note: Reading up on the Chrome Developer Tools is a *very good way* to learn wha
 
 - frontend philosophy
 - code guide
+
+##### Processing LESS, good practices and current conventions
+
+Currently, *most* LESS files are named with the following format: 
+
+_[filename]-[hyphenate]-[all]-[other]-[words].less 
+
+The underscore was more important pre-less-rails, when we were compiling LESS files manually in our local environments. Underscores signify LESS partials, which we do not want compiled.
+
+However, less-rails and the asset pipeline now handle that without any worry on our end. Our files are currently in a mixed syntax, some with and without prepended `_`, and some hyphenated and some underscored. It would be nice to someday agree on a convention and rename all files to follow it. 
 
 ### Wanderable Site Layouts 
 - public
