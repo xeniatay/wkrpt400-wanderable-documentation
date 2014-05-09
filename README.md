@@ -41,13 +41,13 @@ The Wanderable site is built using:
 - [jQuery](http://jquery.com/) via the [jQuery-rails gem](https://github.com/rails/jquery-rails)
 > jQuery is a fast, small, and feature-rich JavaScript library.
 
-Of course, the app does not soly rely on these technologies. Rather, these are the fundamental tools needed to begin development on Wanderable's frontend. 
+Although the app does not rely solely on these technologies, a good grasp of them is enough for basic development on Wanderable's frontend.
 
 ### Wanderable's Asset Pipeline
 
 > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
 
-The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of the pipeline functionality followed by an guide to Wanderable-specific pipeline behaviour. The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
+The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of pipeline functionality followed by a guide to Wanderable-specific pipeline behaviour. **Note:** The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
 
 #### Asset Precompilation: Concatenation and Minification 
 
@@ -59,12 +59,16 @@ Through the Asset Pipeline, Sprockets (a Ruby library) concatenates and minifies
 
 Wanderable's full asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
 
+##### Development
+
 On a local development server, assets are not concatenated or minified for the sake of debugging. However, this means that the local server makes *many* requests on page load for every single file included in the precompile path. This can be slow and frustrating, so to disable this functionality and use precompiled files in development, change the following line to false:
 
     # Expand the lines which load the assets
     config.assets.debug = true 
 
 *Note that this is best done only if the developer is very absolutely not touching any frontend code. Do not commit this for the sake of other developers.*
+
+##### Production 
 
 On Production, the master CSS and JS files are always precompiled. On initial visit, both files are requested from the server and subsequently cached by the browser. These cached files result in a significant decrease in load time throughout the rest of a user's browsing experience on the site, or on return visits. 
 
@@ -89,22 +93,32 @@ Compiling Less and CoffeeScript through the Asset Pipeline removes the hassle of
 
 **Note**: Compiling using the pipeline does mean that your local server may be slower to respond, or fail silently if there is a Less or CoffeeScript syntax error. 
 
---- STOPPED HERE --
-
 #### Using the Asset Pipeline with Wanderable Site Components
 
-Wanderable uses a customized strategy for asset precompilation, targeted towards the separate componenents of our site. Each of these components are targeted towards a different audience:
+Wanderable uses a customized strategy for asset precompilation. Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we split these files by site components. 
 
-- Public Site: potential users and guests looking for a registry
-- Internal Site: existing users who are using our actual product
-- Registry Layouts: existing users viewing others' registries, or guests who are purchasing gifts
-- Channels: white-label hotel registries and the customers they drive to us
-- Merchant Portal: merchants going through our self-serve Merchant Network
-- Admin: for internal use
+A list of Wanderable Site Components:
 
-Each component of the site generally has its own CSS and JS manifest and layout template in `apps/views/layouts`. 
+- Public Site `views/layouts/pubsite_layout.html.erb`
+    - For potential users and guests looking for a registry
+- Internal Site `views/layouts/application.html.erb`
+    - For couples who log in and edit their registries
+- Registry Layouts `views/layouts/registry_layout.html.erb`
+    - For guests making gift purcahses, or existing users browsing other registries
+- Channels `views/layouts/channel.html.erb`
+    - For guests referred to us through our white-label hotel partnerships 
+- Merchant Portal `views/layouts/merchant_portal.html.erb`
+    - For merchants going through our self-serve Merchant Network
+- Admin `views/layouts/admin_layout.html.erb`
+    - For internal use
 
-TODO talk more about site componenets
+Each of these site components have a layout template, CSS manifest file and JS manifest file. 
+
+We implemented separate manifest files for each site component because none of our users typically access every part of the site. 
+
+E.g. a guest visiting a registry to make a gift purchase will not need cached assets for the merchant portal nor internal site - they will never see it. 
+
+Thus, breaking these manifests out by site components saves the user unecessary load time on their site visits. 
 
 For now, we will focus on how we handle asset precompilation for CSS and JS, with Bootstrap, LESS, Coffee and Rails. 
 
