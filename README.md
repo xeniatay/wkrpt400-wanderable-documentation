@@ -95,38 +95,42 @@ Compiling Less and CoffeeScript through the Asset Pipeline removes the hassle of
 
 #### Using the Asset Pipeline with Wanderable Site Components
 
-Wanderable uses a customized strategy for asset precompilation. Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we split these files by site components. 
+Wanderable uses a customized strategy for asset precompilation. Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we have separate manifest files for individual site components. 
 
-A list of Wanderable Site Components:
+**What are the Wanderable site components?**
 
-- Public Site `views/layouts/pubsite_layout.html.erb`
+- Public Site 
     - For potential users and guests looking for a registry
-- Internal Site `views/layouts/application.html.erb`
+    - `views/layouts/pubsite_layout.html.erb`, `app/assets/stylesheets/public-manifest.css`, `app/assets/javascripts/public-manifest.js`
+- Internal Site 
     - For couples who log in and edit their registries
-- Registry Layouts `views/layouts/registry_layout.html.erb`
-    - For guests making gift purcahses, or existing users browsing other registries
-- Channels `views/layouts/channel.html.erb`
+    - `views/layouts/application.html.erb`, `app/assets/stylesheets/internal-manifest.css`, `app/assets/javascripts/internal-manifest.js`
+- Registry Layouts 
+    - For guests making a gift purchase, or existing users browsing other registries
+    - `views/layouts/registry_layout.html.erb`, `app/assets/stylesheets/registry-layouts-manifest.css`, `app/assets/javascripts/layout-manifest.js`
+- Channels 
     - For guests referred to us through our white-label hotel partnerships 
-- Merchant Portal `views/layouts/merchant_portal.html.erb`
+    - `views/layouts/channel.html.erb`, `app/assets/stylesheets/channel-manifest.css`, `app/assets/javascripts/channel-manifest.js`
+- Merchant Portal 
     - For merchants going through our self-serve Merchant Network
-- Admin `views/layouts/admin_layout.html.erb`
+    - `views/layouts/merchant_portal.html.erb`, `app/assets/stylesheets/merchant-manifest.css`, `app/assets/javascripts/merchant-manifest.js`
+- Admin 
     - For internal use
+    - `views/layouts/admin_layout.html.erb`, `app/assets/stylesheets/admin-manifest.css`, `app/assets/javascripts/admin-manifest.js`
 
 Each of these site components have a layout template, CSS manifest file and JS manifest file. 
 
-We implemented separate manifest files for each site component because none of our users typically access every part of the site. 
+**Why have separate manifest files for each site component?**
 
-E.g. a guest visiting a registry to make a gift purchase will not need cached assets for the merchant portal nor internal site - they will never see it. 
+The purpose of a manifest file is to speed up the load time of our site. We know that none of our users typically access every part of our site. 
 
-Thus, breaking these manifests out by site components saves the user unecessary load time on their site visits. 
+> E.g. A guest visits a registry to make a gift purchase. They do not care to load the assets containing styles and scripts for the merchant portal or the internal site. 
+
+Thus, splitting up these manifests based on site component and target audience allows us to reduce load time for everyone who visits Wanderable. 
 
 For now, we will focus on how we handle asset precompilation for CSS and JS, with Bootstrap, LESS, Coffee and Rails. 
 
 #### Manifest Files 
-
-As mentioned earlier, Wanderable has many separate components that comprise the entire app. This requires us to handle asset loading and caching in a smarter way - for example, it does not make sense to load all of the styles for the public AND internal site if the user is merely a guest landing on a registry page to purchase a gift.
-
-Thus, we allocated separate CSS and JS manifests for each of these components.
 
 > Sprockets uses manifest files to determine which assets to include and serve. These manifest files contain directives - instructions that tell Sprockets which files to require in order to build a single CSS or JavaScript file. With these directives, Sprockets loads the files specified, processes them if necessary, concatenates them into one single file and then compresses them (if Rails.application.config.assets.compress is true). By serving one file rather than many, the load time of pages can be greatly reduced because the browser makes fewer requests. Compression also reduces file size, enabling the browser to download them faster.
 
