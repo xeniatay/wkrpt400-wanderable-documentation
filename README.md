@@ -90,18 +90,18 @@ Observe that the cached assets resulted in a 0.6s decrease in load time on Wande
 
 Wanderable uses the pipeline to allow live compilation of CoffeeScript and Less in development mode. This integration happens automatically through the `less-rails` and `coffee-rails` gems.
 
-Advantages of compiling CoffeeScript and Less through the pipeline:
+**Advantages of compiling CoffeeScript and Less through the pipeline:**
 
 - Do not need to keep compiled `.less -> .css` and `.coffee -> .js` files in the repository
 - Prevents merge conflicts caused by committing compiled CSS and JS 
 
-**Note**: Compiling using the pipeline does mean that your local server may be slower to respond, or fail silently if Rails encounters a Less or CoffeeScript error. 
+**Note**: Compiling through pipeline might cause your local server to fail silently when Rails encounters a Less or CoffeeScript error. 
 
-#### Using the Asset Pipeline with Wanderable Site Components
+### Custom Asset Pipeline Behaviour 
 
-Wanderable uses a customized strategy for asset precompilation. 
+**How does Wanderable handle asset precompilation?**
 
-Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we have separate manifest files for individual site components. 
+Instead of having a master CSS and JS file (called *manifest* files) across the entire site, we have separate manifest files for individual site components.
 
 Each site component has:
 
