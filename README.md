@@ -165,13 +165,13 @@ Notice that all our CSS manifest files only include a single `*-bundle` file, wh
 
 This is a workaround to accommodate Less pre-processing features while still using the asset pipeline for precompilation. 
 
-**An explanation of the *-bundle.less files*
+**An explanation of the *-bundle.less files**
 
 When a Less file is included in a manifest by a Sprocket directive, it is compiled individually. This means that it does not have access to mixins and variables defined in other Less files. 
 
 This is very restrictive and undesirable behaviour. To work around this, we use `@import` to consolidate all required files into a *bundle*. This bundle is then included in its corresponding manifest and compiled using Sprocket. 
 
-**Important:** In order to include a new Less file on the site, it has to be added to the appropriate `bundle` using the `@import` function. 
+**Important:** In order to include a new Less file on the site, it has to be added to the appropriate bundle using the `@import` function. 
 
 **About global-bundle.less**
 
