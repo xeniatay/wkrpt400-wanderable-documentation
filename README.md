@@ -57,31 +57,30 @@ The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is
 
 Through the Asset Pipeline, Sprockets (a Ruby library) concatenates and minifies all specified CoffeeScript/JS files into one master `.js` file, and all Less files into one master `.css` file. This process is called asset precompilation.
 
-Wanderable's full asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
+Wanderable's asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
 
-##### Development
+##### How the pipeline behaves in development
 
-On a local development server, assets are not concatenated or minified for the sake of debugging. However, this means that the local server makes *many* requests on page load for every single file included in the precompile path. This can be slow and frustrating, so to disable this functionality and use precompiled files in development, change the following line to false:
+On a local development server, assets are not concatenated or minified, so that debugging by line number is easy. However, this means that the local server makes *many* requests upon page load for every single file included in the precompile path.
+
+**Note:** The above behaviour can be slow and frustrating. To use precompiled files in development, change the following line in `application.rb` to *false*:
 
     # Expand the lines which load the assets
     config.assets.debug = true 
 
-*Note that this is best done only if the developer is very absolutely not touching any frontend code. Do not commit this for the sake of other developers.*
+Keep in mind that this will affect frontend development workflow and you should not commit this for the sake of other developers
 
-##### Production 
+##### How the pipeline behaves in production 
 
-On Production, the master CSS and JS files are always precompiled. On initial visit, both files are requested from the server and subsequently cached by the browser. These cached files result in a significant decrease in load time throughout the rest of a user's browsing experience on the site, or on return visits. 
+Assets are always precompiled on Wanderable's production server. 
 
-Here is an example of the browser requests on initial load of Wanderable's homepage:
-
-> TODO insert image
-
-Now look at the browser requests upon page reload - after the JS and CSS manifests have been cached.
+On a user's initial visit, both the master CSS and JS files are requested from the server and subsequently cached by the browser. Here is an example of the browser requests on Wanderable's homepage:
 
 > TODO insert image
 
-Voila! The load request sizes have been significantly reduced. 
-*Note: the reduced size is also partly due to image caching through Cloudinary*
+Caching these asset files is beneficial to the user because site loading time is decreased on all of their future visits. Here is an example of how the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage: 
+
+> TODO insert image
 
 #### Asset Precompilation: Less and CoffeeScript
 
@@ -101,9 +100,9 @@ Instead of having a master CSS and JS file (called *manifest* files) across the 
 
 Each site component has:
 
-    - A layout template in `views/layouts/`
-    - A CSS manifest file in `app/assets/stylesheets/`
-    - A JS manifest file in `app/assets/javascripts/` 
+- A layout template in `views/layouts/`
+- A CSS manifest file in `app/assets/stylesheets/`
+- A JS manifest file in `app/assets/javascripts/` 
 
 **What are the Wanderable site components?**
 
@@ -161,7 +160,8 @@ You may notice that all our CSS manifest files only include a single `*-bundle` 
 
 This setup is a workaround to accommodate Less precompilation while still using the asset pipeline and manifest system. 
 
-*Explanation*
+**Explanation**
+
 Less files included in a manifest through Sprocket directives do not behave the same way as including a file using `@import`. With Sprocket, files are simply concatenated without pre-processing - compiling Less variables to HEX, mixins to actual classes, etc. 
 
 In order to make full use of Bootstrap and Less variables and mixins, we use the *bundle* workaround: 
@@ -171,6 +171,7 @@ In order to make full use of Bootstrap and Less variables and mixins, we use the
     - Any newly created Less file has to be included in the bundle it belongs to, through the `@import` function
 
 **Note: Imported Bundles**
+
 The `global-bundle.less` is a special bundle that does not belong to any manifest. It stands alone as a set of basic Wanderable styles and contains the following:
 
     - bootstrap overrides
