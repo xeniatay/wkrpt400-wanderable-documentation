@@ -186,82 +186,77 @@ This bundle was separated from the rest because it is re-used by so many other b
 
 We see this behaviour again in the `channel-bundle`, which imports `internal-bundle`. 
 
-#### Working with Bootstrap
-
-Wanderable uses a heavily customized version of Bootstrap. You can see the exact variable overrides in `app/assets/stylesheets/less/global/bootstrap_overrides/_variables.less`
-
-Note: our customization was done manually, not through the [customizer](http://getbootstrap.com/customize/), and thus is a little messy. It consists of variables which *may not* have originally been defined in Bootstrap's `variable.less`. *Nice to have: cleaning up the overrides file*
-
-The Bootstrap CSS components most commonly used on the site are
-    - Grid system and responsive utilities 
-    - Typography
-    - Tables
-    - Forms
-    - Buttons
-    - Helper Classes
-
 #### JS Manifests 
 
-The JS manifest files are a lot more straightforward - they use the Sprocket directives to include either entire directories or specific files from certain directories, which are all commented in each manifest.
+The JS manifest files are straightforward. Here are the two Sprocket directives used in the JS manifests: 
+- `require_tree`: includes all the JS files in the specified directory, in no particular order
+- `require`: includes the specific JS file
 
-*Note the difference between require and require_tree* 
-*jQuery and jQueryujs are required through gems*
+**JS Manifest File Hierachy**
 
-One point to note is that the JS manifests do have dependencies - certain libraries like jQuery, Bootstrap, etc. have to be included at the top of the file before other plugins that use it. 
+Most of our JS files have dependencies. This means that certain libraries like jQuery, Bootstrap, etc. have to be included at the top of the manifest so that other plugins can use it. Here is the typical hierachy for including files: 
 
-`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers (which Wanderable no longer supports), it triggers an unobstrusive header prompting the user to upgrade their browser.
+1. jQuery and jQuery-rails 
+2. Global libraries (bootstrap, jqueryUI, underscore) 
+3. Validation plugins (need to be included in specific order)
+4. Global directory 
+5. Plugin directory corresponding to current manifest e.g. `javascripts/public/plugins`
+6. Main directory corresponding to current manifest e.g. `javascripts/public`
 
-We have started migrating to use coffee, but 90% of our files are still old JS.
+This means that putting a new JS file in an existing directory automatically includes it the corresponding manifest file.
 
-Note: JS manifests are always included at the bottom of the body in a layout, to allow the user to interact with the site without needing to wait for all scripts to be done loading. 
+*Note: jQuery and jQueryujs are required through gems*
 
-Therefore, any inline page JS should be included like this:
+**readyselector.js**
 
-    <% content_for :page_end do %>
-        // code here
-    <% end %>
+(ReadySelector)[https://github.com/Verba/jquery-readyselector] provides a nice syntax for page-specific script. This idea was taken from (*Unholy Rails*)[http://railsapps.github.io/rails-javascript-include-external.html].
 
-However, inline JS is strongly discouraged - the idea is that each page that requires JS should have its own JS file, scoped using its `body-class`. JS file naming conventions: currently we use _ as delimiters, and good practice is to name the JS file the same thing as the view file. This gets confusing if there are two views in different directories with the same name (_form, etc.) so use your discretion and grep accordingly.
+ReadySelector provides nice syntax to scope page-specific script. Scoping JS is important when working with concatenated code, because any broken syntax will easily disable the whole compiled manifest file. 
 
-We also use [readyselector](http://railsapps.github.io/rails-javascript-include-external.html) to scope our JS. This is done using the 
+*How do I scope my javascript?*
+
+First, add a `body-class` to the page. 
 
     <% content_for :body_class do %> page-name page-name-js <% end %>
 
-`.page-name` will usually be used to scope CSS, and `page-name-js` will be used to scope JS like this:
-    
+Next, scope the JS using the `.page-name-js` class.
+
     $('.page-name-js').ready(function() {
         // code goes here
     });
 
+In addition, use `.page-name` to scope the Less file to prevent style overlap.
 
-We scope all of our CSS and JS to the best of our abilities because one of the drawbacks to concatenation is that every page shares the same JS. Thus, when not properly scoped, broken JS in one file can affect the whole site and break all of the JS. 
+**Writing inline Javascript in a view**
 
-This can be seen most commonly when DOM manipulation is happening, e.g.
+In a site component layout, the JS manifest is always included at the bottom of the body. This allows the user to interact with the site without waiting for scripts to load. 
 
-    var box = $('#box-container'),
-        squares = box.find('.squares');
+Therefore, all inline page JS should be included like this:
 
-    squares.last().remove();
+    <% content_for :page_end do %>
+        <script>
+            // code here
+        </script>
+    <% end %>
 
-    // if #box-container does not exist, squares will be undefined and this code will break
+Note that inline JS is strongly discouraged. Any page that requires JS should have its own page-scoped JS file. 
 
-#### Responsive
+**ie-manifest**
 
-Media queries are used to build responsive sites. 
-E.g.
+`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers (which Wanderable no longer supports), it triggers an unobstrusive header prompting the user to upgrade their browser.
+
+### Wanderable's Customized Bootstrap
+
+Wanderable uses Bootstrap with customized variables that are listed in `app/assets/stylesheets/less/global/bootstrap_overrides/_variables.less`.
+
+**Note:** This customization was done manually, instead of using the [customizer](http://getbootstrap.com/customize/). As a result, the file is a little disorganized and consists of variables which were not originally defined in Bootstrap's `variable.less`. *It would be nice to clean this up.*
+
+### Responsive Development
+
+**Using Media Queries**
+
+Media queries are used to build responsive sites. An example of a media query using Less syntax:
     
-    .container {
-        width: 1180px;
-    }
-
-    @media (min-width: 600px) and (max-width: 800px) {
-        .container {
-            width: 800px;
-        }
-    }
-
-In LESS, both the syntax above and the following syntax is supported: 
-
     .container {
         width: 1180px;
 
@@ -270,41 +265,50 @@ In LESS, both the syntax above and the following syntax is supported:
         }
     }
 
-At Wanderable, we use the second LESS-only syntax, because it is cleaner to wrap all of the styles related to a selector in its own braces. This also means that the hierachy of styles will be as follows
+Follow the following convention when writing complicated, nested Less with media queries:
 
-1. Default styles for a selector
-1. Element state styles
+1. Default styles
+1. Element state (active, hover) styles
 1. Pseudo elements, if any
 1. Media queries, if any
-    - Also include nested styles for element states or pseudo elements at that viewport
+    - Include element state styles or pseudo element styles 
 1. Nested elements, if any
 
+An example:
+
     .container {
+        // default styles
         width: 1180px;
 
+        // element state
         &:hover {
             color: red;
         }
 
+        // pseudo elements
         &:before,
         &:after {
             content: '/';
             display: block;
         }
 
+        // media query
         @media @phone {
             width: 800px;
 
+            // element state
             &:hover {
                 color: black;
             }
 
+            // pseudo element
             &:before,
             &:after {
                 display: none;
             }
         }
 
+        // nested child element
         .child-container {
             width: 50%;
         }
@@ -500,6 +504,10 @@ _[filename]-[hyphenate]-[all]-[other]-[words].less
 The underscore was more important pre-less-rails, when we were compiling LESS files manually in our local environments. Underscores signify LESS partials, which we do not want compiled.
 
 However, less-rails and the asset pipeline now handle that without any worry on our end. Our files are currently in a mixed syntax, some with and without prepended `_`, and some hyphenated and some underscored. It would be nice to someday agree on a convention and rename all files to follow it. 
+
+**JS file names**
+
+The Javascript files currently use `_` as delimiters, and good practice is to name the JS file the same thing as the view file. This gets confusing if there are two views in different directories with the same name (_form, etc.) so use your discretion and grep accordingly.
 
 ### Wanderable Site Layouts 
 - public
