@@ -142,23 +142,19 @@ The purpose of a manifest file is to speed up the load time of our site. We know
 
 Thus, splitting up these manifests based on site component and target audience allows us to reduce load time for everyone who visits Wanderable. 
 
-#### How do manifest files work?
+### How Manifest Files Work
 
-Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into that specific manifest. 
+Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into a compiled version of the manifest. 
 
-By default, the asset pipeline precompiles the manifest files `application.css` and `application.js`, so that they can be included in any `.html.erb` file with the following code:
+In a default Rails application, manifest files are named `application.css` and `application.js`. 
 
-    <%= stylesheet_link_tag 'application' %>
-    <%= javascript_include_tag 'application' %>
-
-In order to allow precompilation of multiple manifest files, we added the following line in `application.rb`: 
+To override that behaviour and allow automatic precompilation of multiple manifest files, we added the following line in `application.rb`:
 
     config.assets.precompile += %w( *-manifest.css *-manifest.js )
 
 This line automatically adds any files ending in `-manifest.css` or `-manifest.js` to the precompile path.
 
-
-We can thus include our custom manifests into the layout they belong in. 
+Custom manifests are then included in the layout they belong in:
 
     <%= stylesheet_link_tag 'public-manifest' %>
     <%= javascript_include_tag 'public-manifest' %>
