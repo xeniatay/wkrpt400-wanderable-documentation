@@ -68,7 +68,7 @@ On a local development server, assets are not concatenated or minified, so that 
     # Expand the lines which load the assets
     config.assets.debug = true 
 
-Keep in mind that this will affect frontend development workflow and you should not commit this for the sake of other developers
+Keep in mind that this will affect frontend development workflow and you should not commit this change.
 
 ##### How the pipeline behaves in production 
 
@@ -78,19 +78,24 @@ On a user's initial visit, both the master CSS and JS files are requested from t
 
 > TODO insert image
 
-Caching these asset files is beneficial to the user because site loading time is decreased on all of their future visits. Here is an example of how the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage: 
+Caching asset files is beneficial to a user because it decreases site load time on all of their future visits. Here is the same page as shown above, upon page refresh. 
 
 > TODO insert image
 
-#### Asset Precompilation: Less and CoffeeScript
+Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. 
+
+### Asset Precompilation with CoffeeScript and Less
 
 > The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets.
 
-Wanderable uses the pipeline to allow live compilation of Less and CoffeeScript in development mode. This integration happens through the `less-rails` and `coffee-rails` gems, and do not require extra effort on a developer's part. 
+Wanderable uses the pipeline to allow live compilation of CoffeeScript and Less in development mode. This integration happens automatically through the `less-rails` and `coffee-rails` gems.
 
-Compiling Less and CoffeeScript through the Asset Pipeline removes the hassle of keeping compiled `.less` to `.css` files and `.coffee` to `.js` files in the repository. It also prevents merge conflicts caused by a difference in compilers, or updated files that did not actually have conflicts, but were compiled to a common file. 
+Advantages of compiling CoffeeScript and Less through the pipeline:
 
-**Note**: Compiling using the pipeline does mean that your local server may be slower to respond, or fail silently if there is a Less or CoffeeScript syntax error. 
+- Do not need to keep compiled `.less -> .css` and `.coffee -> .js` files in the repository
+- Prevents merge conflicts caused by committing compiled CSS and JS 
+
+**Note**: Compiling using the pipeline does mean that your local server may be slower to respond, or fail silently if Rails encounters a Less or CoffeeScript error. 
 
 #### Using the Asset Pipeline with Wanderable Site Components
 
