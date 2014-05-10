@@ -161,32 +161,30 @@ Custom manifests are then included in the layout they belong in:
 
 #### CSS Manifests
 
-You may notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
+Notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
 
-This setup is a workaround to accommodate Less precompilation while still using the asset pipeline and manifest system. 
+This is a workaround to accommodate Less pre-processing features while still using the asset pipeline for precompilation. 
 
-**Explanation**
+**An explanation of the *-bundle.less files*
 
-Less files included in a manifest through Sprocket directives do not behave the same way as including a file using `@import`. With Sprocket, files are simply concatenated without pre-processing - compiling Less variables to HEX, mixins to actual classes, etc. 
+When a Less file is included in a manifest by a Sprocket directive, it is compiled individually. This means that it does not have access to mixins and variables defined in other Less files. 
 
-In order to make full use of Bootstrap and Less variables and mixins, we use the *bundle* workaround: 
+This is very restrictive and undesirable behaviour. To work around this, we use `@import` to consolidate all required files into a *bundle*. This bundle is then included in its corresponding manifest and compiled using Sprocket. 
 
-- A `*-manifest.css` file that includes only `-bundle` files. This gets precompiled and served to the user.
-- A `*-bundle.less` file that `@import`s all other required Less files 
-    - Any newly created Less file has to be included in the bundle it belongs to, through the `@import` function
+**Important:** In order to include a new Less file on the site, it has to be added to the appropriate `bundle` using the `@import` function. 
 
-**Note: Imported Bundles**
+**About global-bundle.less**
 
-The `global-bundle.less` is a special bundle that does not belong to any manifest. It stands alone as a set of basic Wanderable styles and contains the following:
+`global-bundle.less` is a special bundle that does not belong to any one manifest. It stands alone as a set of basic Wanderable styles and contains the following:
 
-    - bootstrap overrides
-    - header styles
-    - footer styles
-    - type
+- Bootstrap overrides
+- Header styles
+- Footer styles
+- Type styles
 
-This bundle is separated from the rest so that bundle files are kept [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself). The global bundle is simply included in other bundles, instead of having mass repetition of `@import` statements in each bundle.
+This bundle was separated from the rest because it is re-used by so many other bundles. The global bundle is simply `@import`ed into other bundles, so that all bundles are kept [DRY](http://en.wikipedia.org/wiki/Don't_repeat_yourself). 
 
-We see this behaviour again in the `channel-bundle`, which imports the `internal-bundle`. 
+We see this behaviour again in the `channel-bundle`, which imports `internal-bundle`. 
 
 #### Working with Bootstrap
 
