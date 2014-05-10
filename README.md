@@ -103,7 +103,9 @@ Wanderable uses the pipeline to allow live compilation of CoffeeScript and Less 
 
 Instead of having a master CSS and JS file (called *manifest* files) across the entire site, Wanderable has multiple manifest files based on site component. 
 
-A site component is a major part of the site that has: 
+**What is a site component?**
+
+A site component is a major part of the site that has:
 
 - A layout template in `views/layouts/`
 - A CSS manifest file in `app/assets/stylesheets/`
