@@ -214,18 +214,21 @@ Refer to an existing manifest to see how this is done with Sprocket directives.
 
 [ReadySelector](https://github.com/Verba/jquery-readyselector) is a jQuery plugin that provides a nice syntax to write page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
 
-Scoping JS is important when working with concatenated code, because any broken syntax can disable the whole manifest file. 
+Scoping JS is important when working with concatenated code. Unscoped code with a single syntax error has the potential to break the whole manifest file. 
 
 **How do I scope my javascript?**
 
-- Add a unique class name to a container element that will be used to scope the script
+1. Add a unique class name to a container element that will be used to scope the script
+2. Use ReadySelector to check for this element and wrap it in a `ready()` function
 
-ReadySelector will check for this element on the page, and only execute the scoped scripts if this element exists and is loaded. Here is an example:
+Example ReadySelector syntax: 
 
-    $('.wrapper-container-for-form').ready(function() {
+    $('.wrapper-form-container').ready(function() {
         // Event handlers and element-specific
         // code goes here
     });
+
+ReadySelector will check whether `.wrapper-form-container` exists, and will only execute the scoped scripts if this element is done loading. 
 
 ### Creating a new Wanderable page
 
@@ -247,7 +250,8 @@ Putting it all together, these are the steps you take to create a new page on Wa
 - Next, create a `.less` file and place it in the appropriate component directory 
     - File example: `app/assets/stylesheets/less/global/_search-page.less`
 
-- In this Less file, add a scope for the styles for this page 
+- In this Less file, nest all new styles in a `body_class` wrapper
+    - An example of a Less file for a page with the body_class `.page-sample`
 
 ```
     // styles for page_sample.html.erb
@@ -258,9 +262,8 @@ Putting it all together, these are the steps you take to create a new page on Wa
     }
 ```
 
-- Include this Less file in the appropriate component bundle, e.g.:
-    
-    `@import "less/global/_header";`
+- Include this Less file in the appropriate component bundle
+    - E.g. `@import "less/global/_header";`
 
 **CoffeeScript/Javascript**
 
