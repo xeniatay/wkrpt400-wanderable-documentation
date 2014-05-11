@@ -62,20 +62,10 @@ Completed employer evaluation form (.pdf) (Section 2.2)
 The Wanderable site is built using:
 
 - [Rails (3.1.3)](http://guides.rubyonrails.org/)
-> Ruby on Rails is a full-stack web framework optimized for programmer happiness and sustainable productivity. It encourages beautiful code by favoring convention over configuration.
-
 - [LESS (1.7.0)](http://lesscss.org/) via the [less-rails gem](https://github.com/metaskills/less-rails) 
-> A *gem* is a Ruby software package that provides external functionalities to an existing Rails project. 
-> Less is a CSS-preprocessor, meaning that it extends the CSS language, adding features that allow variables, mixins, functions and many other techniques that allow you to make CSS that is more maintainable, themable and extendable. 
-
 - [CoffeeScript](http://coffeescript.org/) via the [coffee-rails gem](https://github.com/rails/coffee-rails)
-> CoffeeScript is a little language that compiles into JavaScript. CoffeeScript is an attempt to expose the good parts of JavaScript in a simple way. 
-
 - [Bootstrap (3.1.1)](http://getbootstrap.com/)
-> The most popular front-end framework for developing responsive, mobile first projects on the web.
-
 - [jQuery](http://jquery.com/) via the [jQuery-rails gem](https://github.com/rails/jquery-rails)
-> jQuery is a fast, small, and feature-rich JavaScript library.
 
 Although the app does not rely solely on these technologies, a good grasp of them is enough for basic development on Wanderable's frontend.
 
