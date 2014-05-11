@@ -84,13 +84,13 @@ Assets are always precompiled on Wanderable's production server.
 
 On a user's initial visit, both the master CSS and JS files are requested from the server. Here is an example of the browser requests on Wanderable's homepage:
 
-> TODO insert image
+![](http://i.imgur.com/tTulpQX.png)
 
 Upon the initial visit, our asset files will be cached by the user's browser.When this same user visits another Wanderable page, their page load time will be significantly decreased. This is because the browser no longer has to load the cached asset files. 
 
 Here is an example of the browser requests on the same page as above, upon page refresh:
 
-> TODO insert image
+![](http://i.imgur.com/vW0y4vm.png)
 
 Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. This decrease in load time will be especially valuable on a slow or mobile connection.
 
@@ -469,7 +469,7 @@ The mixins save us the trouble of
 
 Here is Wanderable's color palette as defined in `_variables.less`:
 
-> TODO add image here
+![](http://i.imgur.com/mN9WbJe.png)
 
 The actual reference palette is [here](https://drive.google.com/a/wanderable.com/file/d/0B4zAe7q10zwfa3Vtel8zN3F6bEE/edit?usp=sharing).
 
@@ -507,7 +507,7 @@ Using a shell like zsh in the terminal enables you to add useful information in 
 
 Here is an example: 
 
-> TODO insert image here
+![](http://i.imgur.com/Rns82xc.png)
 
 Read [this](https://forrst.com/posts/Oh_my_zsh_iTerm2_Nice_Colors_git_hg_suppo-1Ct) for details on setting up zsh.
 
