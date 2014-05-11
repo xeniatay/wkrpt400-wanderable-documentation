@@ -23,7 +23,7 @@ Completed employer evaluation form (.pdf) (Section 2.2)
 
 <!-- MarkdownTOC depth=4 -->
 
-- [Development Stack](#development-stack)
+- [](#Development Stack)
 - [Wanderable's Asset Pipeline](#wanderables-asset-pipeline)
     - [Asset Precompilation: Concatenation and Minification](#asset-precompilation-1)
     - [How the pipeline behaves in development](#pipeline-in-dev)
@@ -62,7 +62,7 @@ Completed employer evaluation form (.pdf) (Section 2.2)
 
 <!-- /MarkdownTOC -->
 
-## Development Stack[development-stack]
+## [Development Stack](#development-stack)
 
 The Wanderable site is built using:
 
