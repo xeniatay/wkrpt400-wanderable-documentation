@@ -59,30 +59,32 @@ Through the Asset Pipeline, Sprockets (a Ruby library) concatenates and minifies
 
 Wanderable's asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
 
-#### How the pipeline behaves in development
+### How the pipeline behaves in development
 
-On a local development server, assets are not concatenated or minified, so that debugging by line number is easy. However, this means that the local server makes *many* requests upon page load for every single file included in the precompile path.
+On a local development server, assets are not concatenated or minified, so that debugging by line number is easy. The tradeoff for this behaviour is that the local server makes *many* requests upon page load. These requests are for every single file included in the asset pipeline precompile path.
 
-**Note:** The above behaviour can be slow and frustrating. To use precompiled files in development, change the following line in `application.rb` to *false*:
+**Tip:** The above behaviour can be slow and frustrating. To turn off debug mode and request all assets in concatenated form, change the following line in `application.rb` to *false*:
 
     # Expand the lines which load the assets
     config.assets.debug = true 
 
-Keep in mind that this will affect frontend development workflow and you should not commit this change.
+Keep in mind that this will affect frontend development workflow. This is only a workaround for quicker local server response, and should not be committed to the repo.
 
-#### How the pipeline behaves in production 
+### How the pipeline behaves in production 
 
 Assets are always precompiled on Wanderable's production server. 
 
-On a user's initial visit, both the master CSS and JS files are requested from the server and subsequently cached by the browser. Here is an example of the browser requests on Wanderable's homepage:
+On a user's initial visit, both the master CSS and JS files are requested from the server. Here is an example of the browser requests on Wanderable's homepage:
 
 > TODO insert image
 
-Caching asset files is beneficial to a user because it decreases site load time on all of their future visits. Here is the same page as shown above, upon page refresh. 
+Upon the initial visit, our asset files will be cached by the user's browser.When this same user visits another Wanderable page, their page load time will be significantly decreased. This is because the browser no longer has to load the cached asset files. 
+
+Here is an example of the browser requests on the same page as above, upon page refresh:
 
 > TODO insert image
 
-Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. 
+Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. This decrease in load time will be especially valuable on a slow or mobile connection.
 
 ## Asset Precompilation with CoffeeScript and Less
 
@@ -95,7 +97,7 @@ Wanderable uses the pipeline to allow live compilation of CoffeeScript and Less 
 - Do not need to keep compiled `.less -> .css` and `.coffee -> .js` files in the repository
 - Prevents merge conflicts caused by committing compiled CSS and JS 
 
-**Note**: Compiling through pipeline might cause your local server to fail silently when Rails encounters a Less or CoffeeScript error. 
+**Note:**: Compiling through the pipeline means that syntax errors from CoffeeScript and Less will appear in the stack trace from the server, and may throw 500 errors.
 
 ### Custom Asset Pipeline Behaviour 
 
@@ -165,15 +167,15 @@ Notice that all our CSS manifest files only include a single `*-bundle` file, wh
 
 This is a workaround to accommodate Less pre-processing features while still using the asset pipeline for precompilation. 
 
-**An explanation of the *-bundle.less files**
+#### An explanation of the *-bundle.less files
 
 When a Less file is included in a manifest by a Sprocket directive, it is compiled individually. This means that it does not have access to mixins and variables defined in other Less files. 
 
-This is very restrictive and undesirable behaviour. To work around this, we use `@import` to consolidate all required files into a *bundle*. This bundle is then included in its corresponding manifest and compiled using Sprocket. 
+This behaviour is restrictive and undesirable. As a workaround, we used `@import` to consolidate all required files into a *bundle*. This bundle is then included in its corresponding manifest and compiled using Sprocket. 
 
 **Important:** In order to include a new Less file on the site, it has to be added to the appropriate bundle using the `@import` function. 
 
-**About global-bundle.less**
+**A note on global-bundle.less**
 
 `global-bundle.less` is a special bundle that does not belong to any one manifest. It stands alone as a set of basic Wanderable styles and contains the following:
 
@@ -192,9 +194,11 @@ Wanderable's JS manifests use the following Sprocket directives to include files
 - `require_tree`: includes all the JS files in the specified directory, in no particular order
 - `require`: includes the specific JS file
 
-**JS Manifest File Hierachy**
+#### File Hierachy in JS Manifests
 
-Most Javascript files have dependencies. This means that certain libraries like e.g. `jQuery`, `Bootstrap`, etc. have to be included at the top of the manifest so that other plugins can rely on it. Here is a skeleton hierachy to follow when setting up a new manifest: 
+Most Javascript files have dependencies, which means that they rely on code from other libraries. Thus, important libraries like `jQuery` and `Bootstrap` have to be included at the top of the manifest. 
+
+Here is a general hierachy to follow when setting up a new manifest:
 
 1. jQuery and jQuery-rails 
 2. Global libraries (bootstrap, jqueryUI, underscore) 
@@ -203,33 +207,79 @@ Most Javascript files have dependencies. This means that certain libraries like 
 5. Plugin directory corresponding to current manifest, e.g. `javascripts/public/plugins`
 6. Main directory corresponding to current manifest, e.g. `javascripts/public`
 
-This means that putting a new JS file in an existing directory automatically includes it on the site.
+Refer to an existing manifest to see how this is done with Sprocket directives.  
+*Note*: `jquery` and `jquery_ujs (jQuery-rails)` are added to the app through Rails gems
 
-*Note: jQuery and jQueryujs are required through gems*
+### readyselector.js
 
-**readyselector.js**
-
-[ReadySelector](https://github.com/Verba/jquery-readyselector) provides a nice syntax for page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
+[ReadySelector](https://github.com/Verba/jquery-readyselector) is a jQuery plugin that provides a nice syntax to write page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
 
 Scoping JS is important when working with concatenated code, because any broken syntax can disable the whole manifest file. 
 
 **How do I scope my javascript?**
 
-First, add a `body-class` to the page. 
+- Add a unique class name to a container element that will be used to scope the script
 
-    <% content_for :body_class do %> page-name page-name-js <% end %>
+ReadySelector will check for this element on the page, and only execute the scoped scripts if this element exists and is loaded. Here is an example:
 
-Next, scope the JS using the `.page-name-js` class.
-
-    $('.page-name-js').ready(function() {
-        // JS goes here
+    $('.wrapper-container-for-form').ready(function() {
+        // Event handlers and element-specific
+        // code goes here
     });
 
-The `.page-name` class is used to scope the Less file, preventing style overlap. 
+### Creating a new Wanderable page
 
-    .page-name {
-        // Less goes here
+Putting it all together, these are the steps you take to create a new page on Wanderable:
+
+**HTML/View**
+
+- First, add a `body_class` to the page in the view. 
+    
+``` 
+    <% content_for :body_class do %> page-sample page-sample-js <% end %>
+    <% content_for :content do %> 
+      // page content here
+    <% end %>
+```
+
+**Less**
+
+- Next, create a `.less` file and place it in the appropriate component directory 
+    - File example: `app/assets/stylesheets/less/global/_search-page.less`
+
+- In this Less file, add a scope for the styles for this page 
+
+```
+    // styles for page_sample.html.erb
+    // ------------------------------
+
+    .page-sample {
+        // write styles here
     }
+```
+
+- Include this Less file in the appropriate component bundle, e.g.:
+    
+    `@import "less/global/_header";`
+
+**CoffeeScript/Javascript**
+
+- Create a `.coffee`/`.js` file and place it in the appropriate component directory 
+
+- In this Coffee/JS file, add a scope for the scripts on this page:
+
+    /*
+      JS for page_sample.html.erb
+      Scope: .page-sample-js
+    */
+
+    $('.page-sample-js').ready(function() {
+        // write scripts here
+    });
+
+*Voila! The JS file will automatically be included on the site by a manifest.*
+
+**Note**: Wanderable has started migrating to CoffeeScript but 90% of the scripts in the repo are still written in Javascript.
 
 **Writing inline Javascript in a view**
 
@@ -248,53 +298,6 @@ Note that inline JS is strongly discouraged. Any page that requires JS should ha
 **ie-manifest**
 
 `ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers, an unobstrusive header appears, prompting the user to upgrade their browser.
-
-### Creating a new Wanderable page
-
-Here are the steps to create a new page on the site:
-
-*View/HTML*
-- Scope the page using a `body_class` in the view file:
-    
-    <% content_for :body_class do %> page-sample page-sample-js <% end %>
-    <% content_for :content do %> 
-      // page content here
-  <% end %>
-
-**Less**
-
-- Create a Less file and place it in the appropriate component directory 
-    - e.g. `app/assets/stylesheets/less/global/_header.less`
-
-- In the Less file you created, add a scope for the styles you write 
-
-    // styles for page_sample.html.erb
-    // ------------------------------
-
-    .page-sample {
-        // write styles here
-    }
-
-- Include this Less file in the appropriate component bundle
-    
-    @import "less/global/_header";
-
-**JS**
-
-- Create a JS file and place it in the appropriate component directory 
-
-- In the JS file you created, add a scope for the scripts you write
-
-    /*
-      JS for page_sample.html.erb
-      Scope: .page-sample-js
-    */
-
-    $('.page-sample-js').ready(function() {
-        // write scripts here
-    });
-
-*Voila! The JS file will automatically be included on the site by a manifest.*
 
 ## Wanderable's Customized Bootstrap
 
