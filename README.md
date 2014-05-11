@@ -210,6 +210,10 @@ Here is a general hierachy to follow when setting up a new manifest:
 Refer to an existing manifest to see how this is done with Sprocket directives.  
 *Note*: `jquery` and `jquery_ujs (jQuery-rails)` are added to the app through Rails gems
 
+**A note on ie-manifest.js**
+
+`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers, an unobstrusive header appears, prompting the user to upgrade their browser.
+
 ### readyselector.js
 
 [ReadySelector](https://github.com/Verba/jquery-readyselector) is a jQuery plugin that provides a nice syntax to write page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
@@ -267,9 +271,9 @@ Putting it all together, these are the steps you take to create a new page on Wa
 
 **CoffeeScript/Javascript**
 
-- Create a `.coffee`/`.js` file and place it in the appropriate component directory 
+- Next, create a `.coffee` or `.js` file and place it in the appropriate component directory 
 
-- In this Coffee/JS file, add a scope for the scripts on this page:
+- In this Coffee or JS file, scope the page-specific code like this: 
 
 ```
     /*
@@ -282,9 +286,9 @@ Putting it all together, these are the steps you take to create a new page on Wa
     });
 ```
 
-*Voila! The JS file will automatically be included on the site by a manifest.*
+This JS file will automatically be included on the site by the component's manifest. 
 
-**Note**: Wanderable has started migrating to CoffeeScript but 90% of the scripts in the repo are still written in Javascript.
+Note that Wanderable has started using CoffeeScript for JS, but 90% of the existing script files are older and thus written in Javascript. 
 
 **Writing inline Javascript in a view**
 
@@ -299,10 +303,6 @@ Therefore, all inline page JS should be included like this:
     <% end %>
 
 Note that inline JS is strongly discouraged. Any page that requires JS should have its own page-scoped JS file. 
-
-**ie-manifest**
-
-`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers, an unobstrusive header appears, prompting the user to upgrade their browser.
 
 ## Wanderable's Customized Bootstrap
 
