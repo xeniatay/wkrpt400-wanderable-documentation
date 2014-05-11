@@ -80,8 +80,6 @@ The Wanderable site is built using:
 
 Although the app does not rely solely on these technologies, a good grasp of them is enough for basic development on Wanderable's frontend.
 
----
-
 ## Wanderable's Asset Pipeline
 
 > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
@@ -124,8 +122,6 @@ Here is an example of the browser requests on the same page as above, upon page 
 > TODO insert image
 
 Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. This decrease in load time will be especially valuable on a slow or mobile connection.
-
----
 
 ## Asset Precompilation with CoffeeScript and Less
 
@@ -184,8 +180,6 @@ The purpose of a manifest file is to speed up the load time of our site. We know
 > E.g. A guest visits a registry to make a gift purchase. They do not care to load the assets containing styles and scripts for the merchant portal or the internal site. 
 
 Thus, splitting up these manifests based on site component and target audience allows us to reduce load time for everyone who visits Wanderable. 
-
----
 
 ## How Manifest Files Work
 
@@ -257,8 +251,6 @@ Refer to an existing manifest to see how this is done with Sprocket directives.
 
 `ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers, an unobstrusive header appears, prompting the user to upgrade their browser.
 
----
-
 ## readyselector.js
 
 [ReadySelector](https://github.com/Verba/jquery-readyselector) is a jQuery plugin that provides a nice syntax to write page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
@@ -278,8 +270,6 @@ Example ReadySelector syntax:
     });
 
 ReadySelector will check whether `.wrapper-form-container` exists, and will only execute the scoped scripts if this element is done loading. 
-
----
 
 ## Creating a new Wanderable page
 
@@ -351,15 +341,11 @@ Therefore, all inline page JS should be included like this:
 
 Note that inline JS is strongly discouraged. Any page that requires JS should have its own page-scoped JS file. 
 
----
-
 ## Wanderable's Customized Bootstrap
 
 Wanderable uses Bootstrap with customized variables that are listed in `app/assets/stylesheets/less/global/bootstrap_overrides/_variables.less`.
 
 **Note:** This customization was done manually, instead of using the [customizer](http://getbootstrap.com/customize/). As a result, the file is a little disorganized and consists of variables which were not originally defined in Bootstrap's `variable.less`. *It would be nice to clean this up.*
-
----
 
 ## Responsive Development
 
@@ -482,8 +468,6 @@ These variables add a layer of semantic meaning and reduces repetition in the re
 
 On top of responsive variables, there are also additional responsive helper classes defined in `global/_responsive-utilities.less`. These classes are mostly used to handle general `@phone-v` cases, because Bootstrap's responsive utilities do not differentiate between `phone-v` (phone vertical) and `phone-h` (phone horizontal). 
 
----
-
 ## Responsive Images with Cloudinary 
 
 In `global/_responsive-img-mixins.less`, you will find a number of mixins written to work with Cloudinary's image processing API. 
@@ -507,8 +491,6 @@ The mixins save us the trouble of
 ```
 
 *The above is very tedious.*
-
---- 
 
 ## Additional Notes 
 
