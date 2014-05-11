@@ -1,6 +1,5 @@
 # Wanderable Frontend Development
 
-## Table of Contents
 - [Development Stack](#development-stack)
 - [Wanderable's Asset Pipeline](#wanderables-asset-pipeline)
     - [Asset Precompilation: Concatenation and Minification](#asset-precompilation-concatenation-and-minification)
