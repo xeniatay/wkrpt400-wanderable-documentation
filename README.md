@@ -20,49 +20,44 @@ Completed employer evaluation form (.pdf) (Section 2.2)
     specific examples illustrating the impact of the software or of the manual on the user
 
 ## Table of Contents
-
-<!-- MarkdownTOC depth=4 -->
-
-- [](#Development Stack)
+- [Development Stack](#development-stack)
 - [Wanderable's Asset Pipeline](#wanderables-asset-pipeline)
-    - [Asset Precompilation: Concatenation and Minification](#asset-precompilation-1)
-    - [How the pipeline behaves in development](#pipeline-in-dev)
-    - [How the pipeline behaves in production](#pipeline-in-prod)
-- [Asset Precompilation with CoffeeScript and Less](#asset-precompilation-2)
-    - [Custom Asset Pipeline Behaviour](#custom-pipeline-behaviour)
+    - [Asset Precompilation: Concatenation and Minification](#asset-precompilation-concatenation-and-minification)
+    - [How the pipeline behaves in development](#how-the-pipeline-behaves-in-development)
+    - [How the pipeline behaves in production](#how-the-pipeline-behaves-in-production)
+- [Asset Precompilation with CoffeeScript and Less](#asset-precompilation-with-coffeescript-and-less)
+    - [Custom Asset Pipeline Behaviour](#custom-asset-pipeline-behaviour)
 - [How Manifest Files Work](#how-manifest-files-work)
     - [CSS Manifests](#css-manifests)
-        - [An explanation of the *-bundle.less files](#bundle-less-files)
+        - [An explanation of the *-bundle.less files](#an-explanation-of-the-bundleless-files)
     - [JS Manifests](#js-manifests)
-        - [File Hierachy in JS Manifests](#file-hieracy-in-js-manifests)
-- [readyselector.jsa](#ready-selector)
-- [Creating a new Wanderable page](#create-a-new-page)
-    - [HTML/View](#create-page-html-view)
-    - [Less](#create-page-less)
-    - [CoffeeScript/Javascript](#create-page-coffee-js)
-- [Wanderable's Customized Bootstrap](#customized-bootstrap)
+        - [File Hierachy in JS Manifests](#file-hierachy-in-js-manifests)
+- [readyselector.js](#readyselectorjs)
+- [Creating a new Wanderable page](#creating-a-new-wanderable-page)
+    - [HTML/View](#htmlview)
+    - [Less](#less)
+    - [CoffeeScript/Javascript](#coffeescriptjavascript)
+- [Wanderable's Customized Bootstrap](#wanderables-customized-bootstrap)
 - [Responsive Development](#responsive-development)
     - [Using Media Queries](#using-media-queries)
-    - [Working with Responsive Bootstrap](#responsive-bootstrap)
+    - [Working with Responsive Bootstrap](#working-with-responsive-bootstrap)
     - [Media Query Helpers](#media-query-helpers)
 - [Responsive Images with Cloudinary](#responsive-images-with-cloudinary)
 - [Additional Notes](#additional-notes)
-    - [Wanderable's Color Palette](#color-palette)
-    - [Smooth-scrolling plugin](#smooth-scrolling)
-    - [Parallax image plugin](#parallax)
-- [Workflow/helpful tools](#workflow)
+    - [Wanderable's Color Palette](#wanderables-color-palette)
+    - [Smooth-scrolling plugin](#smooth-scrolling-plugin)
+    - [Parallax image plugin](#parallax-image-plugin)
+- [Workflow/helpful tools](#workflowhelpful-tools)
     - [.gitconfig](#gitconfig)
-    - [Improve your shell: zsh](#zsh)
-    - [Text Editor: Sublime Text](#sublime-text)
-    - [Compiling pre-processors: CodeKit](#codekit)
-    - [A code guide for HTML and CSS](#code-guide)
-- [Areas of Improvement](#improvement)
-    - [File Naming Conventions](#file-naming)
+    - [Improve your shell: zsh](#improve-your-shell-zsh)
+    - [Text Editor: Sublime Text](#text-editor-sublime-text)
+    - [Compiling pre-processors: CodeKit](#compiling-pre-processors-codekit)
+    - [A code guide for HTML and CSS](#a-code-guide-for-html-and-css)
+- [Areas of Improvement](#areas-of-improvement)
+    - [File Naming Conventions](#file-naming-conventions)
     - [Web Font Loader](#web-font-loader)
 
-<!-- /MarkdownTOC -->
-
-## [Development Stack](#development-stack)
+## Development Stack
 
 The Wanderable site is built using:
 
@@ -84,13 +79,13 @@ The Wanderable site is built using:
 
 Although the app does not rely solely on these technologies, a good grasp of them is enough for basic development on Wanderable's frontend.
 
-## Wanderable's Asset Pipeline[wanderables-asset-pipeline]
+## Wanderable's Asset Pipeline
 
 > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
 
 The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of pipeline functionality followed by a guide to Wanderable-specific pipeline behaviour. **Note:** The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
 
-### Asset Precompilation: Concatenation and Minification[asset-precompilation-1] 
+### Asset Precompilation: Concatenation and Minification 
 
 > The first feature of the pipeline is to concatenate assets, which can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.
 
@@ -100,7 +95,7 @@ Through the Asset Pipeline, Sprockets (a Ruby library) concatenates and minifies
 
 Wanderable's asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
 
-### How the pipeline behaves in development[pipeline-in-dev]
+### How the pipeline behaves in development
 
 On a local development server, assets are not concatenated or minified, so that debugging by line number is easy. The tradeoff for this behaviour is that the local server makes *many* requests upon page load. These requests are for every single file included in the asset pipeline precompile path.
 
@@ -111,7 +106,7 @@ On a local development server, assets are not concatenated or minified, so that 
 
 Keep in mind that this will affect frontend development workflow. This is only a workaround for quicker local server response, and should not be committed to the repo.
 
-### How the pipeline behaves in production[pipeline-in-prod]
+### How the pipeline behaves in production 
 
 Assets are always precompiled on Wanderable's production server. 
 
@@ -127,7 +122,7 @@ Here is an example of the browser requests on the same page as above, upon page 
 
 Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. This decrease in load time will be especially valuable on a slow or mobile connection.
 
-## Asset Precompilation with CoffeeScript and Less[asset-precompilation-2]
+## Asset Precompilation with CoffeeScript and Less
 
 > The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets.
 
@@ -140,7 +135,7 @@ Wanderable uses the pipeline to allow live compilation of CoffeeScript and Less 
 
 **Note:** Compiling through the pipeline means that syntax errors from CoffeeScript and Less will appear in the stack trace from the server, and may throw 500 errors.
 
-### Custom Asset Pipeline Behaviour[custom-pipeline-behaviour] 
+### Custom Asset Pipeline Behaviour 
 
 **How does Wanderable handle asset precompilation?**
 
@@ -185,7 +180,7 @@ The purpose of a manifest file is to speed up the load time of our site. We know
 
 Thus, splitting up these manifests based on site component and target audience allows us to reduce load time for everyone who visits Wanderable. 
 
-## How Manifest Files Work[how-manifest-files-work]
+## How Manifest Files Work
 
 Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into a compiled version of the manifest. 
 
@@ -202,13 +197,13 @@ Custom manifests are then included in the layout they belong in:
     <%= stylesheet_link_tag 'public-manifest' %>
     <%= javascript_include_tag 'public-manifest' %>
 
-### CSS Manifests[css-manifests]
+### CSS Manifests
 
 Notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
 
 This is a workaround to accommodate Less pre-processing features while still using the asset pipeline for precompilation. 
 
-#### An explanation of the *-bundle.less files[bundle-less-files]
+#### An explanation of the *-bundle.less files
 
 When a Less file is included in a manifest by a Sprocket directive, it is compiled individually. This means that it does not have access to mixins and variables defined in other Less files. 
 
@@ -229,13 +224,13 @@ This bundle was separated from the rest because it is re-used by so many other b
 
 We see this behaviour again in the `channel-bundle`, which imports `internal-bundle`. 
 
-### JS Manifests[js-manifests] 
+### JS Manifests 
 
 Wanderable's JS manifests use the following Sprocket directives to include files: 
 - `require_tree`: includes all the JS files in the specified directory, in no particular order
 - `require`: includes the specific JS file
 
-#### File Hierachy in JS Manifests[file-hieracy-in-js-manifests]
+#### File Hierachy in JS Manifests
 
 Most Javascript files have dependencies, which means that they rely on code from other libraries. Thus, important libraries like `jQuery` and `Bootstrap` have to be included at the top of the manifest. 
 
@@ -255,7 +250,7 @@ Refer to an existing manifest to see how this is done with Sprocket directives.
 
 `ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers, an unobstrusive header appears, prompting the user to upgrade their browser.
 
-## readyselector.jsa[ready-selector]
+## readyselector.js
 
 [ReadySelector](https://github.com/Verba/jquery-readyselector) is a jQuery plugin that provides a nice syntax to write page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
 
@@ -275,11 +270,11 @@ Example ReadySelector syntax:
 
 ReadySelector will check whether `.wrapper-form-container` exists, and will only execute the scoped scripts if this element is done loading. 
 
-## Creating a new Wanderable page[create-a-new-page]
+## Creating a new Wanderable page
 
 Putting it all together, these are the steps you take to create a new page on Wanderable:
 
-### HTML/View[create-page-html-view]
+### HTML/View
 
 - First, add a `body_class` to the page in the view. 
     
@@ -290,7 +285,7 @@ Putting it all together, these are the steps you take to create a new page on Wa
     <% end %>
 ```
 
-### Less[create-page-less]
+### Less
 
 - Next, create a `.less` file and place it in the appropriate component directory 
     - File example: `app/assets/stylesheets/less/global/_search-page.less`
@@ -310,7 +305,7 @@ Putting it all together, these are the steps you take to create a new page on Wa
 - Include this Less file in the appropriate component bundle
     - E.g. `@import "less/global/_header";`
 
-### CoffeeScript/Javascript[create-page-coffee-js]
+### CoffeeScript/Javascript
 
 - Next, create a `.coffee` or `.js` file and place it in the appropriate component directory 
 
@@ -345,15 +340,15 @@ Therefore, all inline page JS should be included like this:
 
 Note that inline JS is strongly discouraged. Any page that requires JS should have its own page-scoped JS file. 
 
-## Wanderable's Customized Bootstrap[customized-bootstrap]
+## Wanderable's Customized Bootstrap
 
 Wanderable uses Bootstrap with customized variables that are listed in `app/assets/stylesheets/less/global/bootstrap_overrides/_variables.less`.
 
 **Note:** This customization was done manually, instead of using the [customizer](http://getbootstrap.com/customize/). As a result, the file is a little disorganized and consists of variables which were not originally defined in Bootstrap's `variable.less`. *It would be nice to clean this up.*
 
-## Responsive Development[responsive-development]
+## Responsive Development
 
-### Using Media Queries[using-media-queries]
+### Using Media Queries
 
 Media queries are used to build responsive sites. An example of a media query using Less syntax:
     
@@ -416,7 +411,7 @@ Here is an example of how to organize your Less rules:
 
 Try to keep nested rules to a maximum of 3 levels deep.
 
-### Working with Responsive Bootstrap[responsive-bootstrap]
+### Working with Responsive Bootstrap
 
 Wanderable's site is fully responsive, largely relying on [Bootstrap's responsive grid](http://getbootstrap.com/css/#grid) and responsive utility classes. 
 
@@ -433,7 +428,7 @@ Unlike Bootstrap, our responsive development is not mobile-first. This is somewh
 
 Most existing Less code was written desktop-first (768px - 991px). This was done to support browsers (IE8) with no media query features. However, since dropping IE8 support in March 2014, writing desktop-first is no longer a priority.
 
-### Media Query Helpers[media-query-helpers]
+### Media Query Helpers
 
 Wanderable has additional media query helper variables built on top of Bootstrap's variables. These variables were added because Bootstrap's media queries felt clunky, repetitive and unintuitive.
 
@@ -472,7 +467,7 @@ These variables add a layer of semantic meaning and reduces repetition in the re
 
 On top of responsive variables, there are also additional responsive helper classes defined in `global/_responsive-utilities.less`. These classes are mostly used to handle general `@phone-v` cases, because Bootstrap's responsive utilities do not differentiate between `phone-v` (phone vertical) and `phone-h` (phone horizontal). 
 
-## Responsive Images with Cloudinary[responsive-images-with-cloudinary]
+## Responsive Images with Cloudinary 
 
 In `global/_responsive-img-mixins.less`, you will find a number of mixins written to work with Cloudinary's image processing API. 
 
@@ -496,9 +491,9 @@ The mixins save us the trouble of
 
 *The above is very tedious.*
 
-## Additional Notes[additional-notes]
+## Additional Notes 
 
-### Wanderable's Color Palette[color-palette]
+### Wanderable's Color Palette
 
 Here is Wanderable's color palette as defined in `_variables.less`:
 
@@ -506,7 +501,7 @@ Here is Wanderable's color palette as defined in `_variables.less`:
 
 The actual reference palette is [here](https://drive.google.com/a/wanderable.com/file/d/0B4zAe7q10zwfa3Vtel8zN3F6bEE/edit?usp=sharing).
 
-### Smooth-scrolling plugin[smooth-scrolling]
+### Smooth-scrolling plugin
 
 The smooth-scrolling plugin enables smooth-scrolling to any anchor link on the same page. It is located in `global/smooth-scroll.js`.
 
@@ -518,7 +513,7 @@ Add the data attribute `data-smoothscroll='true'` to any anchor link.
 
 *Voila!* The link should now scroll smoothly to the corresponding element.
 
-### Parallax image plugin[parallax]
+### Parallax image plugin
 
 The parallax scrolling plugin enables a parallax effect on any element with a background image. It is located in `global/parallax-scrolling.js`.
 
@@ -528,13 +523,13 @@ Add the class `.parallax-scroll` to any element with a background image.
 
 **Note:** This class adds both CSS styles and JS effects to the element.
 
-## Workflow/helpful tools[workflow]
+## Workflow/helpful tools
 
-### .gitconfig[gitconfig]
+### .gitconfig
 
 A customized `.gitconfig` file can go a long way in optimizing your git workflow. It provides color highlighting in diffs, cleaner git logs, and a ton of useful features. 
 
-### Improve your shell: zsh[zsh]
+### Improve your shell: zsh
 
 Using a shell like zsh in the terminal enables you to add useful information in your command prompt. Some examples are current git hash, git branch status, current git branch, etc. This can be useful in conjunction with the .gitconfig file.
 
@@ -544,23 +539,23 @@ Here is an example:
 
 Read [this](https://forrst.com/posts/Oh_my_zsh_iTerm2_Nice_Colors_git_hg_suppo-1Ct) for details on setting up zsh.
 
-### Text Editor: Sublime Text[sublime-text]
+### Text Editor: Sublime Text
 
 Sublime Text 3 is a great open-source text editor. It has amazing features like `cmd + p` fuzzy finding for filenames, and it can search across directories in the editor (essentially a more convenient `grep`). 
 
 It has Vim support in the form of Vintage and Vintageous packages, but note that these packages cannot mimic Vim completely.
 
-### Compiling pre-processors: CodeKit[codekit]
+### Compiling pre-processors: CodeKit
 
 CodeKit is a great tool for compiling LESS, Coffee, or any other sort of pre-processed language. It hasn't been necessary for Wanderable since we started compiling LESS and Coffee through Rails, but it is good to know about. 
 
-### A code guide for HTML and CSS[code-guide]
+### A code guide for HTML and CSS
 
 Read [Code Guide](http://codeguide.co/)., written by the creator of Bootstrap. 
 
-## Areas of Improvement[improvement]
+## Areas of Improvement
 
-### File Naming Conventions[file-naming]
+### File Naming Conventions
 
 In the frontend, HTML, Less and JS file names should be standardized with a naming convention. This would optimize the process of looking for a specific class, rule or script and save the trouble of `grep`ping blindly across the repo. 
 
@@ -570,7 +565,7 @@ Some naming conventions to consider:
 - Filename delimiters: dashes or underscores?
 - Should all views, JS and Less files have the same filename? e.g. `honeymoon-registry-form.html.erb`, `honeymoon-registry-form.js`, `honeymoon-registry-form.less`
 
-### Web Font Loader[web-font-loader]
+### Web Font Loader
 
 The [Web Font Loader](https://github.com/typekit/webfontloader) can be used to load fonts with TypeKit AND Google Fonts (on registry layouts). It supports asynchronous loading which can help reduce load time for registries that may be loading up to 4 fonts. This is particularly important for guests who are buying last-minute gifts on mobile.
 
