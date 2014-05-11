@@ -43,13 +43,13 @@ The Wanderable site is built using:
 
 Although the app does not rely solely on these technologies, a good grasp of them is enough for basic development on Wanderable's frontend.
 
-### Wanderable's Asset Pipeline
+## Wanderable's Asset Pipeline
 
 > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
 
 The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of pipeline functionality followed by a guide to Wanderable-specific pipeline behaviour. **Note:** The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
 
-#### Asset Precompilation: Concatenation and Minification 
+### Asset Precompilation: Concatenation and Minification 
 
 > The first feature of the pipeline is to concatenate assets, which can reduce the number of requests that a browser makes to render a web page. Web browsers are limited in the number of requests that they can make in parallel, so fewer requests can mean faster loading for your application.
 
@@ -59,7 +59,7 @@ Through the Asset Pipeline, Sprockets (a Ruby library) concatenates and minifies
 
 Wanderable's asset precompilation is done automatically through Heroku when deploying a new version of the app to a Heroku server.
 
-##### How the pipeline behaves in development
+#### How the pipeline behaves in development
 
 On a local development server, assets are not concatenated or minified, so that debugging by line number is easy. However, this means that the local server makes *many* requests upon page load for every single file included in the precompile path.
 
@@ -70,7 +70,7 @@ On a local development server, assets are not concatenated or minified, so that 
 
 Keep in mind that this will affect frontend development workflow and you should not commit this change.
 
-##### How the pipeline behaves in production 
+#### How the pipeline behaves in production 
 
 Assets are always precompiled on Wanderable's production server. 
 
@@ -84,7 +84,7 @@ Caching asset files is beneficial to a user because it decreases site load time 
 
 Observe that the cached assets resulted in a 0.6s decrease in load time on Wanderable's homepage. 
 
-### Asset Precompilation with CoffeeScript and Less
+## Asset Precompilation with CoffeeScript and Less
 
 > The third feature of the asset pipeline is it allows coding assets via a higher-level language, with precompilation down to the actual assets.
 
@@ -142,7 +142,7 @@ The purpose of a manifest file is to speed up the load time of our site. We know
 
 Thus, splitting up these manifests based on site component and target audience allows us to reduce load time for everyone who visits Wanderable. 
 
-### How Manifest Files Work
+## How Manifest Files Work
 
 Manifest files contain [Sprocket directives](http://guides.rubyonrails.org/asset_pipeline.html#manifest-files-and-directives), which tell Sprocket which files to concatenate and minify into a compiled version of the manifest. 
 
@@ -159,7 +159,7 @@ Custom manifests are then included in the layout they belong in:
     <%= stylesheet_link_tag 'public-manifest' %>
     <%= javascript_include_tag 'public-manifest' %>
 
-#### CSS Manifests
+### CSS Manifests
 
 Notice that all our CSS manifest files only include a single `*-bundle` file, which seems redundant. 
 
@@ -186,34 +186,34 @@ This bundle was separated from the rest because it is re-used by so many other b
 
 We see this behaviour again in the `channel-bundle`, which imports `internal-bundle`. 
 
-#### JS Manifests 
+### JS Manifests 
 
-The JS manifest files are straightforward. Here are the two Sprocket directives used in the JS manifests: 
+Wanderable's JS manifests use the following Sprocket directives to include files: 
 - `require_tree`: includes all the JS files in the specified directory, in no particular order
 - `require`: includes the specific JS file
 
 **JS Manifest File Hierachy**
 
-Most of our JS files have dependencies. This means that certain libraries like jQuery, Bootstrap, etc. have to be included at the top of the manifest so that other plugins can use it. Here is the typical hierachy for including files: 
+Most Javascript files have dependencies. This means that certain libraries like e.g. `jQuery`, `Bootstrap`, etc. have to be included at the top of the manifest so that other plugins can rely on it. Here is a skeleton hierachy to follow when setting up a new manifest: 
 
 1. jQuery and jQuery-rails 
 2. Global libraries (bootstrap, jqueryUI, underscore) 
 3. Validation plugins (need to be included in specific order)
 4. Global directory 
-5. Plugin directory corresponding to current manifest e.g. `javascripts/public/plugins`
-6. Main directory corresponding to current manifest e.g. `javascripts/public`
+5. Plugin directory corresponding to current manifest, e.g. `javascripts/public/plugins`
+6. Main directory corresponding to current manifest, e.g. `javascripts/public`
 
-This means that putting a new JS file in an existing directory automatically includes it the corresponding manifest file.
+This means that putting a new JS file in an existing directory automatically includes it on the site.
 
 *Note: jQuery and jQueryujs are required through gems*
 
 **readyselector.js**
 
-(ReadySelector)[https://github.com/Verba/jquery-readyselector] provides a nice syntax for page-specific script. This idea was taken from (*Unholy Rails*)[http://railsapps.github.io/rails-javascript-include-external.html].
+[ReadySelector](https://github.com/Verba/jquery-readyselector) provides a nice syntax for page-specific script. This idea was taken from [*Unholy Rails*](http://railsapps.github.io/rails-javascript-include-external.html).
 
-ReadySelector provides nice syntax to scope page-specific script. Scoping JS is important when working with concatenated code, because any broken syntax will easily disable the whole compiled manifest file. 
+Scoping JS is important when working with concatenated code, because any broken syntax can disable the whole manifest file. 
 
-*How do I scope my javascript?*
+**How do I scope my javascript?**
 
 First, add a `body-class` to the page. 
 
@@ -222,10 +222,14 @@ First, add a `body-class` to the page.
 Next, scope the JS using the `.page-name-js` class.
 
     $('.page-name-js').ready(function() {
-        // code goes here
+        // JS goes here
     });
 
-In addition, use `.page-name` to scope the Less file to prevent style overlap.
+The `.page-name` class is used to scope the Less file, preventing style overlap. 
+
+    .page-name {
+        // Less goes here
+    }
 
 **Writing inline Javascript in a view**
 
@@ -243,15 +247,62 @@ Note that inline JS is strongly discouraged. Any page that requires JS should ha
 
 **ie-manifest**
 
-`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers (which Wanderable no longer supports), it triggers an unobstrusive header prompting the user to upgrade their browser.
+`ie-manifest` is a special manifest created to handle LTIE9 browsers. In those browsers, an unobstrusive header appears, prompting the user to upgrade their browser.
 
-### Wanderable's Customized Bootstrap
+### Creating a new Wanderable page
+
+Here are the steps to create a new page on the site:
+
+*View/HTML*
+- Scope the page using a `body_class` in the view file:
+    
+    <% content_for :body_class do %> page-sample page-sample-js <% end %>
+    <% content_for :content do %> 
+      // page content here
+  <% end %>
+
+**Less**
+
+- Create a Less file and place it in the appropriate component directory 
+    - e.g. `app/assets/stylesheets/less/global/_header.less`
+
+- In the Less file you created, add a scope for the styles you write 
+
+    // styles for page_sample.html.erb
+    // ------------------------------
+
+    .page-sample {
+        // write styles here
+    }
+
+- Include this Less file in the appropriate component bundle
+    
+    @import "less/global/_header";
+
+**JS**
+
+- Create a JS file and place it in the appropriate component directory 
+
+- In the JS file you created, add a scope for the scripts you write
+
+    /*
+      JS for page_sample.html.erb
+      Scope: .page-sample-js
+    */
+
+    $('.page-sample-js').ready(function() {
+        // write scripts here
+    });
+
+*Voila! The JS file will automatically be included on the site by a manifest.*
+
+## Wanderable's Customized Bootstrap
 
 Wanderable uses Bootstrap with customized variables that are listed in `app/assets/stylesheets/less/global/bootstrap_overrides/_variables.less`.
 
 **Note:** This customization was done manually, instead of using the [customizer](http://getbootstrap.com/customize/). As a result, the file is a little disorganized and consists of variables which were not originally defined in Bootstrap's `variable.less`. *It would be nice to clean this up.*
 
-### Responsive Development
+## Responsive Development
 
 **Using Media Queries**
 
@@ -261,23 +312,23 @@ Media queries are used to build responsive sites. An example of a media query us
         width: 1180px;
 
         @media (min-width: 600px) and (max-width: 800px) {
-            width: 1180px;
+            width: 800px;
         }
     }
 
-Follow the following convention when writing complicated, nested Less with media queries:
+Writing media queries like this can quickly lead to a mess of complicated, nested rules. To prevent this, organize your Less rules using the following convention: 
 
-1. Default styles
-1. Element state (active, hover) styles
+1. Element styling
+1. Element state (active, hover) styling
 1. Pseudo elements, if any
 1. Media queries, if any
-    - Include element state styles or pseudo element styles 
+    - Include element state styling or pseudo element styling 
 1. Nested elements, if any
 
-An example:
+Here is an example of how to organize your Less rules:
 
     .container {
-        // default styles
+        // element styling
         width: 1180px;
 
         // element state
@@ -314,110 +365,72 @@ An example:
         }
     }
 
+Try to keep nested rules to a maximum of 3 levels deep.
+
+**Using Bootstrap's Grid System**
+
 Wanderable's site is fully responsive, largely relying on [Bootstrap's responsive grid](http://getbootstrap.com/css/#grid) and responsive utility classes. 
 
-A simple philosophy behind building responsive pages is to keep in mind how the page should look on mobile even when building out the desktop markup. Also, avoid including classes if they are uncessary. Typically, this means writing classes like this:
+Here are some examples of responsive columns using Bootstrap:
 
     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"></div>
-
-or this:
-
     <div class="col-xs-12 col-sm-3"></div>
 
-The code above depicts a column of content - when there is more screen estate, the column spans less of the whole page, and increases accordingly according to the viewport. In the second example, we want the column to be 1/3 of the container, for any screen size > `sm`. Thus, we do not include the `md` and `lg` classes.
+Refer to Bootstrap's documentation for a detailed explanation of these helper classes.
 
-Bootstrap's responsive philosophy is mobile-first. Unfortunately, we don't really use this at Wanderable - responsive is a feature, but not our priority.  
+**Responsive Philosophy**
 
-Currently, our LESS is written desktop-first, and by desktop I mean {768px - 991px}. This is mostly because IE8 does not support media queries, and writing desktop-first LESS will allow default fallbacks to how the site should look in desktop view.
+Unlike Bootstrap, our responsive development is not mobile-first. This is somewhat due to an informal design process. 
 
-However, after most of the responsive LESS for the public site was written, we decided to drop support for IE8. This grants us the freedom to write media queries in any order we want! 
- 
+Most existing Less code was written desktop-first (768px - 991px). This was done to support browsers (IE8) with no media query features. However, since dropping IE8 support in March 2014, writing desktop-first is no longer a priority.
 
-We have a bunch of helper variables built in on top of Bootstrap's media query variables. This was done because their media queries felt clunky and repetitive - and were unintuitive. 
+**Media Query Helpers**
 
-    // TODO: clean this crazy stuff up
-    @screen-phone-max: @screen-xs-max;
-    @screen-tablet-max: @screen-sm-max;
-    @screen-desktop-max: @screen-md-max;
+Wanderable has additional media query helper variables built on top of Bootstrap's variables. These variables were added because Bootstrap's media queries felt clunky, repetitive and unintuitive.
 
-    @phone-v: ~"(max-width: 319px)";
-    @phone-h: ~"(min-width: 320px) and (max-width: 479px)"; // max-width: 479px
-    @phone: ~"(max-width: 479px)"; // max-width: 479px
-    @tablet: ~"(min-width: @{screen-xs}) and (max-width: @{screen-xs-max})"; // min-width: 480px, max-width: 767px
-    @desktop: ~"(min-width: @{screen-sm}) and (max-width: @{screen-sm-max})"; // min-width: 768px, max-width: 991px
-    @desktop-lg: ~"(min-width: @{screen-desktop})"; // min-width: 992px
+Here are the custom Wanderable variables in pseudocode: 
 
-    @lt-tablet: @phone; // max-width: 479px;
-    @lt-desktop: ~"(max-width: @{screen-xs-max})"; // max-width: 767px
-    @lt-desktop-lg: ~"(max-width: @{screen-md-max})"; // max-width: 991px
+    @screen-phone-max: 767px;
+    @screen-tablet-max: 991px;
+    @screen-desktop-max: 1199px;
 
-    @desktop-only: ~"(min-width: @{screen-sm})"; // min-width: 768px;
+    @phone-v: (max-width: 319px); // phone-vertical
+    @phone-h: (min-width: 320px) and (max-width: 479px); // phone-horizontal
+    @phone: (max-width: 479px);
+    @tablet: (min-width: 480px) and (max-width: 767px); 
+    @desktop: (min-width: 768px) and (max-width: 991px); 
+    @desktop-lg: (min-width: 992px); 
 
-I will be the first to admit that our queries are also cluttered, but they are more straightforward. As you can see, there is a TODO to clean it up.
+    @lt-tablet: (max-width: 479px); 
+    @lt-desktop: (max-width: 767px); 
+    @lt-desktop-lg: (max-width: 991px); 
 
-I also added some responsive utilities in `global/_responsive-utilities.less`. These were basically to handle the `@phone-v` cases which bootstrap does not support.
+    @desktop-only: (min-width: 768px); 
 
-Basically, the queries I added just simplifies Bootstrap's syntax and adds a layer of meaning (phone, tablet, etc.) to the queries. 
+These variables add a layer of semantic meaning and reduces repetition in the responsive code. Here is what the same media query looks like using Bootstrap's variables versus Wanderable's variables.
 
-For example, Wanderable's media query:
-    
-    @media @tablet {
-        // responsive code here
-    }
-
-Bootstrap's version:
-
+    // Bootstrap's Media Query Variables
     @media (min-width: @screen-xs) and (max-width: @screen-sm-max) {
         // responsive code here
     }
 
-One caveat is this: media queries operate by inheritance, the same as any other CSS rule.
-
-So this means that 
-    
-    @media @lt-desktop { // phone and tablet
-        color: red;
-    }
-
-    @media @phone {
-        color: blue;
-    }
-
-The color will be blue when the viewport is phone small. This is despite @lt-desktop encompassing both phone and tablet.
-
-    @media @phone {
-        color: blue;
-    }
-
-    @media @lt-desktop { // phone and tablet
-        color: red;
-    }
-
-Colour will always be red, because red overwrites blue.
-
-The right way: 
-
-    @media @phone {
-        color: blue;
-    }
-
+    // Wanderable's Media Query Variables
     @media @tablet {
-        color: red;
+        // responsive code here
     }
 
-Different colors :) 
 
-One more thing: @grid-breakpoint is a bootstrap variable used for the responsive nav, it is manually defined and should be changed accordingly if needed.
+**Wanderable's Responsive Utilities**
 
-##### Doing responsive with Cloudinary 
+On top of responsive variables, there are also additional responsive helper classes defined in `global/_responsive-utilities.less`. These classes are mostly used to handle general `@phone-v` cases, which bootstrap does not support.
 
-Look at `global/_responsive-img-mixins.less`.
+## Responsive Images with Cloudinary 
 
-Basically, wrote a bunch of mixins to tie in with Cloudinary's API so that LESS compiles responsive images for us automatically.
+In `global/_responsive-img-mixins.less`, you will find a number of mixins written to work with Cloudinary's image processing API. 
 
-Also made use of Cloudinary's image processing for the public site.
+These mixins allow us to pass in certain parameters like `cloudinary_id`, `width`, `height`, `opacity`, etc. into a Less mixin. The mixin will compile these params into image URLs that correspond to the current viewport size. 
 
-Else, responsive images are usually done like this 
+The mixins save us the trouble of writing media queries that look like this:
 
     .hero-unit {
         background-image: url('image-url.png');
@@ -428,50 +441,34 @@ Else, responsive images are usually done like this
         @media @tablet { background-image: url('image-url-tablet.png'); }
     }
 
-Yes, it's very tedious.
+*The above is very tedious.*
 
-The reason this works is because background images are then loaded conditionally depending on the viewport. 
+## Additional Notes 
 
-Background images which aren't supposed to be loaded will then only be loaded when necessary - usually only when the user resizes the window on purpose. 
+### Wanderable's Color Palette
 
-Cool fact: if an element with a background image is loaded, most modern browsers are also smart enough to not load the background image at all.
+Wanderable's color palette as defined in `_variables.less`:
 
-Also, this can only be done with background images, not `<img>` tags.
+> TODO add image here
 
-### Additional notes
+### Using the smooth-scrolling plugin
 
-Here's Wanderable's color palette as defined in `_variables.less`
+The smooth-scrolling plugin enables smooth-scrolling to any anchor link on the same page. It is located in `global/smooth-scroll.js`.
 
-#### Smooth-scrolling plugin
-
-`global/smooth-scroll.js`
-Enables smooth-scrolling to any anchor link on the same page. 
-
-Simply add attribute "data-smoothscroll='true'" to any anchor link to enable smooth scrolling
+*Usage*
+Add the data attribute `data-smoothscroll='true'` to any anchor link. 
 
     <a href="#signup-form" data-smoothscroll="true">Go to signup</a>
 
-#### Parallax image plugin
+*Voila!*
 
-`global/parallax-scrolling.js`
+### Parallax image plugin
 
-Simply add class `.parallax-scroll` to any container element with a background image.
+The parallax scrolling plugin enables a parallax effect on any element with a background image. It is located in `global/parallax-scrolling.js`.
 
-This class is used by both CSS and JS.
-
-#### Adding a new page
-
-The workflow for adding a new page is as follows:
-
-In the `.html.erb` file, if it requires any custom CSS or JS, scope it using
-    
-    <% content_for :body_class %> page-sample page-sample-js <% end %>
-
-Create a CSS file in the corresponding directory (for its component). 
-
-Include the CSS file in the appropriate bundle. 
-
-Create a JS file in the corresponding directory (for its component). It will magically be included on the page and you can check this by viewing all the scripts that are being included on the page in development mode. Remember to scope the JS.
+*Usage*
+Add the class `.parallax-scroll` to any element with a background image.
+This class adds both CSS styles and JS effects to the element.
 
 ### Workflow/helpful tools
 
