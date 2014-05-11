@@ -476,60 +476,62 @@ Add the data attribute `data-smoothscroll='true'` to any anchor link.
 
     <a href="#signup-form" data-smoothscroll="true">Go to signup</a>
 
-*Voila!* Click the link to see it scroll smoothly to the corresponding element.
+*Voila!* The link should now scroll smoothly to the corresponding element.
 
 ### Parallax image plugin
 
 The parallax scrolling plugin enables a parallax effect on any element with a background image. It is located in `global/parallax-scrolling.js`.
 
-*Usage*
+**Usage**
+
 Add the class `.parallax-scroll` to any element with a background image.
-This class adds both CSS styles and JS effects to the element.
+
+**Note:** This class adds both CSS styles and JS effects to the element.
 
 ### Workflow/helpful tools
 
-A customized `.gitconfig` file is always a nice-to-have, it allows for color highlighting in diffs, prettier git logs. 
+#### .gitconfig
 
-Changing your shell (bash, zsh, fish) also allows you to add cool stuff in your prompt like git branch statuses and the current hash. 
+A customized `.gitconfig` file can go a long way in optimizing your git workflow. It provides color highlighting in diffs, cleaner git logs, and a ton of useful features. 
 
-Sublime Text 3 is a great open-source text editor, best feature is fuzzy finding, which allows you to `cmd + p` and search for any filename without needed to autocomplete. It has Vim support in the form of Vintage and Vintageous packages, but note that these packages are still being developed and it does not act exactly like Vim although it tries its best.
+#### Improve your shell: zsh
 
-CodeKit is a great tool for compiling LESS, Coffee, or any other sort of pre-processed languages. It costs $30 and hasn't been necessary for Wanderable since we started compiling LESS and Coffee through Rails, but it is good to know. It also offers Linting on the fly!
+Using a shell like zsh in the terminal enables you to add useful information in your command prompt. Some examples are current git hash, git branch status, current git branch, etc. This can be useful in conjunction with the .gitconfig file.
 
-using the Networks tab in the [Chrome Developer Tools](https://developers.google.com/chrome-developer-tools/docs/network)
+Here is an example: 
 
-Note: Reading up on the Chrome Developer Tools is a *very good way* to learn what the browser is capable of, and how performance optimization is done. 
-    - console debugger and stuff
-    - inspect element
-    - networks
-    - timeline (jank, repainting)
-    - resources (cookies, localhost, localstorage)
+> TODO insert image here
 
-- frontend philosophy
-- code guide
+Read [this](https://forrst.com/posts/Oh_my_zsh_iTerm2_Nice_Colors_git_hg_suppo-1Ct) for details on setting up zsh.
 
-##### Processing LESS, good practices and current conventions
+#### Text Editor: Sublime Text
 
-Currently, *most* LESS files are named with the following format: 
+Sublime Text 3 is a great open-source text editor. It has amazing features like `cmd + p` fuzzy finding for filenames, and it can search across directories in the editor (essentially a more convenient `grep`). 
 
-_[filename]-[hyphenate]-[all]-[other]-[words].less 
+It has Vim support in the form of Vintage and Vintageous packages, but note that these packages cannot mimic Vim completely.
 
-The underscore was more important pre-less-rails, when we were compiling LESS files manually in our local environments. Underscores signify LESS partials, which we do not want compiled.
+#### Compiling pre-processors: CodeKit
 
-However, less-rails and the asset pipeline now handle that without any worry on our end. Our files are currently in a mixed syntax, some with and without prepended `_`, and some hyphenated and some underscored. It would be nice to someday agree on a convention and rename all files to follow it. 
+CodeKit is a great tool for compiling LESS, Coffee, or any other sort of pre-processed language. It hasn't been necessary for Wanderable since we started compiling LESS and Coffee through Rails, but it is good to know about. 
 
-**JS file names**
+#### A code guide for HTML and CSS
 
-The Javascript files currently use `_` as delimiters, and good practice is to name the JS file the same thing as the view file. This gets confusing if there are two views in different directories with the same name (_form, etc.) so use your discretion and grep accordingly.
+Read [Code Guide](http://codeguide.co/)., written by the creator of Bootstrap. 
 
-### Wanderable Site Layouts 
-- public
-- internal
-- layout
-- merchant
-- admin
+### Areas of Improvement
 
-### Improvements
-- webfontloader
-- cutting out loads on layouts
-- data-src for responsive images
+#### File Naming Conventions
+
+In the frontend, HTML, Less and JS file names should be standardized with a naming convention. This would optimize the process of looking for a specific class, rule or script and save the trouble of `grep`ping blindly across the repo. 
+
+Some naming conventions to consider:
+
+- Less: underscore prefix or not?
+- Filename delimiters: dashes or underscores?
+- Should all views, JS and Less files have the same filename? e.g. `honeymoon-registry-form.html.erb`, `honeymoon-registry-form.js`, `honeymoon-registry-form.less`
+
+#### Web Font Loader
+
+The [Web Font Loader](https://github.com/typekit/webfontloader) can be used to load fonts with TypeKit AND Google Fonts (on registry layouts). It supports asynchronous loading which can help reduce load time for registries that may be loading up to 4 fonts. This is particularly important for guests who are buying last-minute gifts on mobile.
+
+*The end :)*
