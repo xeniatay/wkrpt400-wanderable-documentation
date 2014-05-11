@@ -1,23 +1,4 @@
-# Wanderable: Frontend Notes
-
-> Notes
-1500 and 2000 words
-Title Page (Section 3.2)
-Letter or Memorandum of Submittal (Section 3.3)
-Analysis (Section 3.12 if you are submitting a user manual or a non-analytical report)
-Recommendations, if appropriate (Section 3.9)
-Acknowledgments, if appropriate (Section 3.11)
-Completed employer evaluation form (.pdf) (Section 2.2)
-
-## 500 word Analysis 
-
-    Include a Title Page and Letter or Memorandum of Submittal with your Analysis. 
-    For example, if you write a user’s manual, you might include the following: 
-    the purpose of the manual
-    the characteristics of a good user manual
-    possible improvements to the manual
-    reasons why the software described in the manual is needed and the problems it solves
-    specific examples illustrating the impact of the software or of the manual on the user
+# Wanderable Frontend Development
 
 ## Table of Contents
 - [Development Stack](#development-stack)
@@ -73,7 +54,9 @@ Although the app does not rely solely on these technologies, a good grasp of the
 
 > The asset pipeline provides a framework to concatenate and minify or compress JavaScript and CSS assets. It also adds the ability to write these assets in other languages and pre-processors such as CoffeeScript, Sass and ERB.
 
-The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of pipeline functionality followed by a guide to Wanderable-specific pipeline behaviour. **Note:** The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
+The [Rails Asset Pipeline](http://guides.rubyonrails.org/asset_pipeline.html) is a crucial step in our development workflow. Below is a brief summary of pipeline functionality followed by a guide to Wanderable-specific pipeline behaviour. 
+
+**Note:** The official Rails guide provides a much richer explanation and should be read for full understanding of the pipeline. 
 
 ### Asset Precompilation: Concatenation and Minification 
 
