@@ -258,12 +258,12 @@ Putting it all together, these are the steps you take to create a new page on Wa
     - An example of a Less file for a page with the body_class `.page-sample`
 
 ```
-    // styles for page_sample.html.erb
-    // ------------------------------
+// styles for page_sample.html.erb
+// ------------------------------
 
-    .page-sample {
-        // write styles here
-    }
+.page-sample {
+    // write styles here
+}
 ```
 
 - Include this Less file in the appropriate component bundle
@@ -276,14 +276,14 @@ Putting it all together, these are the steps you take to create a new page on Wa
 - In this Coffee or JS file, scope the page-specific code like this: 
 
 ```
-    /*
-      JS for page_sample.html.erb
-      Scope: .page-sample-js
-    */
+/*
+  JS for page_sample.html.erb
+  Scope: .page-sample-js
+*/
 
-    $('.page-sample-js').ready(function() {
-        // write scripts here
-    });
+$('.page-sample-js').ready(function() {
+    // write scripts here
+});
 ```
 
 This JS file will automatically be included on the site by the component's manifest. 
@@ -388,7 +388,7 @@ Refer to Bootstrap's documentation for a detailed explanation of these helper cl
 
 **Responsive Philosophy**
 
-Unlike Bootstrap, our responsive development is not mobile-first. This is somewhat due to an informal design process. 
+Unlike Bootstrap, our responsive development is not mobile-first. This is somewhat due to an informal design process that focuses on the desktop experience. 
 
 Most existing Less code was written desktop-first (768px - 991px). This was done to support browsers (IE8) with no media query features. However, since dropping IE8 support in March 2014, writing desktop-first is no longer a priority.
 
@@ -409,9 +409,9 @@ Here are the custom Wanderable variables in pseudocode:
     @desktop: (min-width: 768px) and (max-width: 991px); 
     @desktop-lg: (min-width: 992px); 
 
-    @lt-tablet: (max-width: 479px); 
-    @lt-desktop: (max-width: 767px); 
-    @lt-desktop-lg: (max-width: 991px); 
+    @lt-tablet: (max-width: 479px); // less than tablet
+    @lt-desktop: (max-width: 767px); // less than dekstop
+    @lt-desktop-lg: (max-width: 991px); // less than desktop-large
 
     @desktop-only: (min-width: 768px); 
 
@@ -430,24 +430,29 @@ These variables add a layer of semantic meaning and reduces repetition in the re
 
 **Wanderable's Responsive Utilities**
 
-On top of responsive variables, there are also additional responsive helper classes defined in `global/_responsive-utilities.less`. These classes are mostly used to handle general `@phone-v` cases, which bootstrap does not support.
+On top of responsive variables, there are also additional responsive helper classes defined in `global/_responsive-utilities.less`. These classes are mostly used to handle general `@phone-v` cases, because Bootstrap's responsive utilities do not differentiate between `phone-v` (phone vertical) and `phone-h` (phone horizontal). 
 
 ## Responsive Images with Cloudinary 
 
 In `global/_responsive-img-mixins.less`, you will find a number of mixins written to work with Cloudinary's image processing API. 
 
-These mixins allow us to pass in certain parameters like `cloudinary_id`, `width`, `height`, `opacity`, etc. into a Less mixin. The mixin will compile these params into image URLs that correspond to the current viewport size. 
+These mixins allow us to pass in certain parameters like `cloudinary_id`, `width`, `height`, `opacity`, etc. Each mixin compiles its params into image URLs that scale according to viewport size. 
 
-The mixins save us the trouble of writing media queries that look like this:
+The mixins save us the trouble of 
 
-    .hero-unit {
-        background-image: url('image-url.png');
-        background-size: cover;
-        background-repeat: no-repeat;
+- Generating 5 versions of the same image at different sizes
+- Having to write media queries that look like this:
 
-        @media @phone { background-image: url('image-url-phone.png'); }
-        @media @tablet { background-image: url('image-url-tablet.png'); }
-    }
+```
+.hero-unit {
+    background-image: url('image-url.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    @media @phone { background-image: url('image-url-phone-200px-100px.png'); }
+    @media @tablet { background-image: url('image-url-tablet-600px-400px.png'); }
+}
+```
 
 *The above is very tedious.*
 
@@ -455,20 +460,23 @@ The mixins save us the trouble of writing media queries that look like this:
 
 ### Wanderable's Color Palette
 
-Wanderable's color palette as defined in `_variables.less`:
+Here is Wanderable's color palette as defined in `_variables.less`:
 
 > TODO add image here
+
+The actual reference palette is [here](https://drive.google.com/a/wanderable.com/file/d/0B4zAe7q10zwfa3Vtel8zN3F6bEE/edit?usp=sharing).
 
 ### Using the smooth-scrolling plugin
 
 The smooth-scrolling plugin enables smooth-scrolling to any anchor link on the same page. It is located in `global/smooth-scroll.js`.
 
-*Usage*
+**Usage**
+
 Add the data attribute `data-smoothscroll='true'` to any anchor link. 
 
     <a href="#signup-form" data-smoothscroll="true">Go to signup</a>
 
-*Voila!*
+*Voila!* Click the link to see it scroll smoothly to the corresponding element.
 
 ### Parallax image plugin
 
