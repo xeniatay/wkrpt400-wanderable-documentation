@@ -271,6 +271,7 @@ Putting it all together, these are the steps you take to create a new page on Wa
 
 - In this Coffee/JS file, add a scope for the scripts on this page:
 
+```
     /*
       JS for page_sample.html.erb
       Scope: .page-sample-js
@@ -279,6 +280,7 @@ Putting it all together, these are the steps you take to create a new page on Wa
     $('.page-sample-js').ready(function() {
         // write scripts here
     });
+```
 
 *Voila! The JS file will automatically be included on the site by a manifest.*
 
